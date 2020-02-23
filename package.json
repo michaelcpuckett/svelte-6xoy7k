@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "jsonld": "2.0.2"
+  },
+  "type": "module"
+}
