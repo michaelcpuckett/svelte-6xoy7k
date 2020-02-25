@@ -183,12 +183,8 @@ class PropertyConstraintComponent extends ConstraintComponent {
     super(constraint)
   }
   async infer(target, focusNode) {
-    if (this._constraint.path) {
-      const nextTargets = typeof target[focusNode.path.id] === 'object' ? Array.isArray(target[focusNode.path.id]) ? target[focusNode.path.id] : [target[focusNode.path.id]] : [target]
-      return await Promise.all(nextTargets.map(async target => await this.inferShape(this._constraint, target, focusNode)))
-    } else {
-      throw new Error('NO PATH')
-    }
+    const nextTargets = typeof target[focusNode.path.id] === 'object' ? Array.isArray(target[focusNode.path.id]) ? target[focusNode.path.id] : [target[focusNode.path.id]] : [target]
+    return await this.getInferenceResult(nextTargets, await this.getRulesByType(this._constraint), focusNode)
   }
   async validate(target) {
     const validationResult = await this.validateShape(this._constraint, target, this._constraint.path.id)
@@ -364,16 +360,16 @@ export class SHACLEngine extends SHACL {
     this.originalDataGraph = dataGraph
   }
   async init() {
-    const {
-      "@graph": $data
-    } = await jsonld.flatten(this.originalDataGraph, {
+    const $dataGraph = await jsonld.flatten(this.originalDataGraph, {
       "@context": {
         "id": "@id",
         "type": "@type"
       }
-    }, {
-      embed: true
     })
+
+    delete $dataGraph["@context"]
+
+    const $data = $dataGraph["@graph"] || [$dataGraph]
 
     const {
       "@graph": $shapes
@@ -397,7 +393,7 @@ export class SHACLEngine extends SHACL {
 
     const {
       "@graph": inferredGraph
-    } = await jsonld.frame({
+    } = await jsonld.flatten({
       "@context": {
         "id": "@id",
         "type": "@type"
@@ -408,9 +404,8 @@ export class SHACLEngine extends SHACL {
         "id": "@id",
         "type": "@type"
       }
-    }, {
-      embed: true
     })
+    // this.inferredGraph = inferredGraph
     this.inferredGraph = await jsonld.frame({
       "@context": {
         "id": "@id",
@@ -424,7 +419,7 @@ export class SHACLEngine extends SHACL {
     }, {
       embed: true
     })
-    return inferredGraph
+    return this.inferredGraph
   }
   async validate() {
     const report = await this.getValidationResults()
