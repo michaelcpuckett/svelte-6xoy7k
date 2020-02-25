@@ -7,6 +7,7 @@ const exampleDataGraph = {
     "type": "@type"
   },
   "type": "Person",
+  "givenName": "Alice",
   "lastName": "BAD LAST NAME",
   "knows": [{
     "type": "Person",
@@ -43,8 +44,7 @@ const exampleShapesGraph = {
   },
   "property": [{
     "type": "PropertyShape",
-    "path": "schema:givenName",
-    "values": "Alice"
+    "path": "schema:givenName"
   }, {
     "type": "PropertyShape",
     "path": "schema:familyName",
@@ -68,7 +68,7 @@ const exampleShapesGraph = {
   await engine.init()
   await engine.infer()
   await engine.validate()
-  console.log(engine.validationReport)
-  console.log(engine.$data)
+  // console.log(engine.validationReport)
+  // console.log(engine.$data)
   console.log(engine.inferredGraph)
 })()

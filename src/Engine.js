@@ -129,7 +129,6 @@ class SHACL {
   async inferFromRule(type, rule, target, focusNode) {
     const Component = await this.getRuleComponent(type, focusNode)
     if (Component) {
-      // console.log('HAS COMPONENT', Component)
       const component = Component._values ? Component : new Component(rule)
       return component.infer(target, focusNode)
     } else {
@@ -367,7 +366,7 @@ export class SHACLEngine extends SHACL {
   async init() {
     const {
       "@graph": $data
-    } = await jsonld.frame(this.originalDataGraph, {
+    } = await jsonld.flatten(this.originalDataGraph, {
       "@context": {
         "id": "@id",
         "type": "@type"
@@ -398,13 +397,33 @@ export class SHACLEngine extends SHACL {
 
     const {
       "@graph": inferredGraph
-    } = await jsonld.compact({
-      "@context": this.originalDataGraph["@context"],
+    } = await jsonld.frame({
+      "@context": {
+        "id": "@id",
+        "type": "@type"
+      },
       "@graph": results
     }, {
-      "@context": this.originalDataGraph["@context"]
+      "@context": {
+        "id": "@id",
+        "type": "@type"
+      }
+    }, {
+      embed: true
     })
-    this.inferredGraph = inferredGraph
+    this.inferredGraph = await jsonld.frame({
+      "@context": {
+        "id": "@id",
+        "type": "@type"
+      },
+      "@graph": inferredGraph
+    }, {
+      "@context": {
+        ...this.originalDataGraph["@context"]
+      }
+    }, {
+      embed: true
+    })
     return inferredGraph
   }
   async validate() {
