@@ -368,11 +368,13 @@ export class SHACLEngine extends SHACL {
     const {
       "@context": dataContext,
       ...data
-    } = await jsonld.compact(this.originalDataGraph, {
+    } = await jsonld.frame(this.originalDataGraph, {
       "@context": {
         "id": "@id",
         "type": "@type"
       }
+    }, {
+      embed: true
     })
 
     const $data = data["@graph"] || [data]
@@ -406,7 +408,7 @@ export class SHACLEngine extends SHACL {
     }, {
       "@context": this.originalDataGraph["@context"]
     })
-    this.inferredGraph = inferredGraph
+    this.inferredGraph = [...new Set(inferredGraph.map(item => JSON.stringify(item)))].map(item => JSON.parse(item)).filter(({ id }) => !id || this.$data.id === id)
     return this.inferredGraph
   }
   async validate() {
