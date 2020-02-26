@@ -487,7 +487,7 @@ export class SHACLEngine extends SHACL {
           "id": "@id",
           "type": "@type"
         },
-        "@graph": thisResult
+        "@graph": [...this.$data, ...thisResult]
       }, {
         "@context": {
           "id": "@id",
