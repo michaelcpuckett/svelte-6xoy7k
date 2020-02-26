@@ -129,6 +129,7 @@ class SHACL {
   async inferFromRule(type, rule, target, focusNode) {
     const Component = await this.getRuleComponent(type, focusNode)
     if (Component) {
+      // console.log('HAS COMPONENT', Component)
       const component = Component._values ? Component : new Component(rule)
       return component.infer(target, focusNode)
     } else {
@@ -183,8 +184,12 @@ class PropertyConstraintComponent extends ConstraintComponent {
     super(constraint)
   }
   async infer(target, focusNode) {
-    const nextTargets = typeof target[focusNode.path.id] === 'object' ? Array.isArray(target[focusNode.path.id]) ? target[focusNode.path.id] : [target[focusNode.path.id]] : [target]
-    return await this.getInferenceResult(nextTargets, await this.getRulesByType(this._constraint), focusNode)
+    if (this._constraint.path) {
+      const nextTargets = typeof target[focusNode.path.id] === 'object' ? Array.isArray(target[focusNode.path.id]) ? target[focusNode.path.id] : [target[focusNode.path.id]] : [target]
+      return await Promise.all(nextTargets.map(async target => await this.inferShape(this._constraint, target, focusNode)))
+    } else {
+      throw new Error('NO PATH')
+    }
   }
   async validate(target) {
     const validationResult = await this.validateShape(this._constraint, target, this._constraint.path.id)
@@ -360,29 +365,31 @@ export class SHACLEngine extends SHACL {
     this.originalDataGraph = dataGraph
   }
   async init() {
-    const $dataGraph = await jsonld.flatten(this.originalDataGraph, {
+    const {
+      "@context": dataContext,
+      ...data
+    } = await jsonld.compact(this.originalDataGraph, {
       "@context": {
         "id": "@id",
         "type": "@type"
       }
     })
 
-    delete $dataGraph["@context"]
-
-    const $data = $dataGraph["@graph"] || [$dataGraph]
+    const $data = data["@graph"] || [data]
 
     const {
-      "@graph": $shapes
-    } = await jsonld.frame(this.originalShapesGraph, {
+      "@context": shapesContext,
+      ...shapes
+    } = await jsonld.compact(this.originalShapesGraph, {
       "@context": {
         "@base": "http://www.w3.org/ns/shacl#",
         "@vocab": "http://www.w3.org/ns/shacl#",
         "id": "@id",
         "type": "@type"
       }
-    }, {
-      embed: true
     })
+
+    const $shapes = shapes["@graph"] || [shapes]
 
     this.$shapes = $shapes
     this.$data = $data
@@ -393,32 +400,13 @@ export class SHACLEngine extends SHACL {
 
     const {
       "@graph": inferredGraph
-    } = await jsonld.flatten({
-      "@context": {
-        "id": "@id",
-        "type": "@type"
-      },
+    } = await jsonld.compact({
+      "@context": this.originalDataGraph["@context"],
       "@graph": results
     }, {
-      "@context": {
-        "id": "@id",
-        "type": "@type"
-      }
+      "@context": this.originalDataGraph["@context"]
     })
-    // this.inferredGraph = inferredGraph
-    this.inferredGraph = await jsonld.frame({
-      "@context": {
-        "id": "@id",
-        "type": "@type"
-      },
-      "@graph": inferredGraph
-    }, {
-      "@context": {
-        ...this.originalDataGraph["@context"]
-      }
-    }, {
-      embed: true
-    })
+    this.inferredGraph = inferredGraph
     return this.inferredGraph
   }
   async validate() {
