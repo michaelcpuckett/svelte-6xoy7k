@@ -171,10 +171,17 @@ class SHACL {
   }
 }
 
+SHACL.prototype.toJSON = function() {
+  return {
+    type: this.constructor.name,
+    ...Object.fromEntries(Object.entries(this).filter(([key]) => key !== '__proto__'))
+  }
+}
+
 class ConstraintComponent extends SHACL {
   constructor(constraint) {
     super()
-    this._constraint = constraint
+    this.constraint = constraint
   }
 }
 
@@ -183,16 +190,16 @@ class PropertyConstraintComponent extends ConstraintComponent {
     super(constraint)
   }
   async infer(target, focusNode) {
-    if (this._constraint.path) {
+    if (this.constraint.path) {
       const nextTargets = typeof target[focusNode.path.id] === 'object' ? Array.isArray(target[focusNode.path.id]) ? target[focusNode.path.id] : [target[focusNode.path.id]] : [target]
-      return await Promise.all(nextTargets.map(async target => await this.inferShape(this._constraint, target, focusNode)))
+      return await Promise.all(nextTargets.map(async target => await this.inferShape(this.constraint, target, focusNode)))
     } else {
       throw new Error('NO PATH')
     }
   }
   async validate(target, focusNode) {
-    const nextTargets = typeof target[this._constraint.path.id] === 'object' ? Array.isArray(target[this._constraint.path.id]) ? target[this._constraint.path.id] : [target[this._constraint.path.id]] : [target]
-    const validationResult = await Promise.all(nextTargets.map(async target => await this.validateShape(this._constraint, target, this._constraint.path.id)))
+    const nextTargets = typeof target[this.constraint.path.id] === 'object' ? Array.isArray(target[this.constraint.path.id]) ? target[this.constraint.path.id] : [target[this.constraint.path.id]] : [target]
+    const validationResult = await Promise.all(nextTargets.map(async target => await this.validateShape(this.constraint, target, this.constraint.path.id)))
 
     return {
       component: this,
@@ -212,7 +219,7 @@ class HasValueConstraintComponent extends ConstraintComponent {
       component: this,
       focusNode,
       target,
-      validationResult: target[focusNode] === this._constraint
+      validationResult: target[focusNode] === this.constraint
     }
   }
 }
@@ -226,7 +233,7 @@ class ClassConstraintComponent extends ConstraintComponent {
       component: this,
       focusNode,
       target,
-      validationResult: target.type === this._constraint.id
+      validationResult: target.type === this.constraint.id
     }
   }
 }
@@ -240,7 +247,7 @@ class MinCountConstraintComponent extends ConstraintComponent {
       component: this,
       focusNode,
       target,
-      validationResult: (this._constraint === 1 && !Array.isArray(target[focusNode]) && (target[focusNode] || target[focusNode] !== false)) || (Array.isArray(target[focusNode]) && target[focusNode].length >= this._constraint)
+      validationResult: (this.constraint === 1 && !Array.isArray(target[focusNode]) && (target[focusNode] || target[focusNode] !== false)) || (Array.isArray(target[focusNode]) && target[focusNode].length >= this.constraint)
     }
   }
 }
@@ -254,7 +261,7 @@ class MaxCountConstraintComponent extends ConstraintComponent {
       component: this,
       focusNode,
       target,
-      validationResult: Array.isArray(target[focusNode]) && (target[focusNode].length <= this._constraint)
+      validationResult: Array.isArray(target[focusNode]) && (target[focusNode].length <= this.constraint)
     }
   }
 }
@@ -268,7 +275,7 @@ class MinLengthConstraintComponent extends ConstraintComponent {
       component: this,
       focusNode,
       target,
-      validationResult: typeof target[focusNode] === 'string' && target[focusNode].length >= this._constraint
+      validationResult: typeof target[focusNode] === 'string' && target[focusNode].length >= this.constraint
     }
   }
 }
@@ -282,7 +289,7 @@ class MaxLengthConstraintComponent extends ConstraintComponent {
       component: this,
       focusNode,
       target,
-      validationResult: typeof target[focusNode] === 'string' && target[focusNode].length <= this._constraint
+      validationResult: typeof target[focusNode] === 'string' && target[focusNode].length <= this.constraint
     }
   }
 }
@@ -296,7 +303,7 @@ class DatatypeConstraintComponent extends ConstraintComponent {
       component: this,
       focusNode,
       target,
-      validationResult: typeof target[focusNode] === this._constraint.id.split('../2001/XMLSchema#')[1]
+      validationResult: typeof target[focusNode] === this.constraint.id.split('../2001/XMLSchema#')[1]
     }
   }
 }
@@ -328,7 +335,7 @@ class NodeKindConstraintComponent extends ConstraintComponent {
           default: return 'Literal'
         }
       })(),
-      validationResult: nodeKinds[this._constraint.id].includes((() => {
+      validationResult: nodeKinds[this.constraint.id].includes((() => {
         switch (true) {
           case (typeof node === 'string') && node.startsWith('http'): return 'NamedNode'
           case (typeof node === 'string') && node.startsWith('_:'): return 'BlankNode'
@@ -434,7 +441,9 @@ export class SHACLEngine extends SHACL {
       }
     })
 
-    const formattedGraph = await jsonld.compact({
+    this._inferredGraph = inferredGraph
+
+    const formattedInferredGraph = await jsonld.compact({
       "@context": {
         "id": "@id",
         "type": "@type"
@@ -444,31 +453,33 @@ export class SHACLEngine extends SHACL {
       "@context": this.originalDataGraph["@context"]
     })
 
-    this.inferredGraph = formattedGraph    
+    this.inferredGraph = formattedInferredGraph
     
     return this.inferredGraph
   }
   async validate() {
-    const find = result =>
-      result !== true ||
-      (Array.isArray(result) && result.find(find))
-
-    const filter = ({ validationResult }) =>
-      !validationResult ||
-      (
-        Array.isArray(validationResult) &&
-        validationResult
-          .find(find)
-      )
-
-    const filterAll = ({ validationResult }) =>
-      !validationResult ||
-      (
-        Array.isArray(validationResult) &&
-        validationResult
-          .find(filter)
-      )
-    const report = (await this.getValidationResults()).flat(Infinity).filter(filter).map(filterAll).filter(_ => _)
+    const {
+      "@context": context,
+      "@graph": reportGraph
+    } = await jsonld.frame({
+      "@context": {
+        "@base": "http://www.w3.org/ns/shacl#",
+        "@vocab": "http://www.w3.org/ns/shacl#",
+        "id": "@id",
+        "type": "@type"
+      },
+      "@graph": [...new Set((await this.getValidationResults()).flat(Infinity).map(item => JSON.stringify(item)))].map(item => JSON.parse(item))
+    }, {
+      "@context": {
+        "@base": "http://www.w3.org/ns/shacl#",
+        "@vocab": "http://www.w3.org/ns/shacl#",
+        "id": "@id",
+        "type": "@type"
+      }
+    })
+    const report = reportGraph.filter(({ validationResult }) => typeof validationResult !== 'undefined' && validationResult !== true).map(node => ({
+      ...node
+    })).filter(({ validationResult }) => typeof validationResult !== 'undefined' && validationResult !== true)
     const conforms = report ? !report.length : true
 
     this.validationReport = {
@@ -482,7 +493,7 @@ export class SHACLEngine extends SHACL {
     const nodesWithTargets = (await Promise.all(this.$shapes.map(async node => [await this.getTargets(node), node]))).map(([hasTargets, node]) => hasTargets ? node : null).filter(_ => _)
     return await Promise.all(nodesWithTargets.map(async node => {
       const targets = await this.getTargets(node)
-      const matchedTargets = await this.matchTargets(targets, this.$data)
+      const matchedTargets = await this.matchTargets(targets, this._inferredGraph || this.$data)
       const constraintsByType = await this.getConstraintsByType(node)
       return (await this.getValidationResult(matchedTargets, constraintsByType, node))
     }))

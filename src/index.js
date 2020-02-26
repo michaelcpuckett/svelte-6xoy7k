@@ -70,7 +70,6 @@ const exampleShapesGraph = {
       "type": "PropertyShape",
       "path": "schema:knows",
       "class": "schema:Person",
-      "minCount": 1,
       "property": [{
         "path": "schema:test",
         "values": {
@@ -87,6 +86,5 @@ const exampleShapesGraph = {
   await engine.infer()
   await engine.validate()
   console.log(engine.validationReport)
-  // console.log(engine.$data)
   console.log(engine.inferredGraph)
 })()
