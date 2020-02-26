@@ -35,6 +35,14 @@ class SHACL {
       const targetClass = targets.find(({ targetClass }) => targetClass).targetClass.id
       return $data.filter(({ type }) => type === targetClass)
     }
+    if (targets.find(({ targetSubjectsOf }) => targetSubjectsOf)) {
+      const targetSubjectsOf = targets.find(({ targetSubjectsOf }) => targetSubjectsOf).targetSubjectsOf.id
+      return $data.filter(({ [targetSubjectsOf]: predicate }) => predicate || predicate === false)
+    }
+    // if (targets.find(({ targetObjectsOf }) => targetObjectsOf)) {
+    //   const targetObjectsOf = targets.find(({ targetObjectsOf }) => targetObjectsOf).targetObjectsOf.id
+    //   return $data.filter(({ type }) => type === targetObjectsOf)
+    // }
   }
   async getTargets({
     targetNode,
@@ -233,7 +241,7 @@ class ClassConstraintComponent extends ConstraintComponent {
       component: this,
       focusNode,
       target,
-      validationResult: target.type === this.constraint.id
+      validationResult: target.type === this.constraint.id || (target['rdf:type'] && target['rdf:type'].id === this.constraint.id)
     }
   }
 }
@@ -402,7 +410,8 @@ export class SHACLEngine extends SHACL {
       embed: true
     })
 
-    const $data = data["@graph"] || [data]
+    this.originalDataContext = dataContext
+    this.$data = data["@graph"] || [data]
 
     const {
       "@context": shapesContext,
@@ -418,10 +427,8 @@ export class SHACLEngine extends SHACL {
       embed: true
     })
 
-    const $shapes = shapes["@graph"] || [shapes]
-
-    this.$shapes = $shapes
-    this.$data = $data
+    this.originalShapesContext = shapesContext
+    this.$shapes = shapes["@graph"] || [shapes]
   }
   async infer() {
     const ruleOrders = [0]
@@ -439,11 +446,16 @@ export class SHACLEngine extends SHACL {
         "id": "@id",
         "type": "@type"
       }
+    }, {
+      embed: true
     })
 
     this._inferredGraph = inferredGraph
 
-    const pass1 = await jsonld.compact({
+    const {
+      "@context": c,
+      "@graph": g
+    } = await jsonld.compact(await jsonld.frame(await jsonld.flatten({
       "@context": {
         "id": "@id",
         "type": "@type"
@@ -454,31 +466,43 @@ export class SHACLEngine extends SHACL {
         ...this.originalDataGraph["@context"],
         "rdf:type": { "@type": "@id", "@id": "@type" }
       }
-    })
-
-    const pass2 = await jsonld.flatten(pass1, {
-      "@context": {
-        ...this.originalDataGraph["@context"],
-        "rdf:type": { "@type": "@id", "@id": "@type" }
-      }
-    })
-
-    const pass3 = await jsonld.expand(pass2, {
-      "@context": this.originalDataGraph["@context"]
-    })
-
-    const pass4 = await jsonld.frame(pass2, {
+    }), {
       "@context": {
         ...this.originalDataGraph["@context"]
       }
-    })
-
-    const pass5 = await jsonld.compact(pass4, {
+    }, {
+      "@context": this.originalDataGraph["@context"]
+    }, {
+      embed: true
+    }), {
       "@context": this.originalDataGraph["@context"]
     })
 
-    this.inferredGraph = pass5
-    
+    const {
+      "@context": _c,
+      "@graph": _g,
+      ...originalData
+    } = this.originalDataGraph
+
+    const originalIDs = (_g || [originalData]).filter(({ "@id": id }) => id).map(({ "@id": id }) => id)
+
+    const {
+      "@context": finalContext,
+      "@graph": dataGraph
+    } = {
+      "@context": c,
+      "@graph": g.filter(({ "@id": id }) => !id || (id && !id.startsWith('_:b') && originalIDs.includes(id)))
+    }
+
+    this.inferredGraph = await jsonld.compact({
+      "@context": finalContext,
+      ...(dataGraph.length > 1 ? {
+        "@graph": dataGraph
+      } : dataGraph[0])
+    }, {
+      "@context": finalContext
+    })
+
     return this.inferredGraph
   }
   async validate() {

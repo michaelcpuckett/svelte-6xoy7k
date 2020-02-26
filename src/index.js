@@ -2,28 +2,17 @@ import { SHACLEngine } from './Engine.js'
 
 const exampleDataGraph = {
   "@context": {
-    "@base": "http://schema.org/",
-    "@vocab": "http://schema.org/"
+    "@base": "http://news.org/",
+    "@vocab": "http://news.org/",
+    // "id": "@id",
+    // "type": "@type"
   },
-  "@graph": [{
-    "@id": "zuko",
-    "@type": "Person",
-    "givenName": "Zuko",
-    "familyName": "OK"
+  "articles": [{
+    "title": "Headline 1",
+    "author": "Alice Jones"
   }, {
-    "@type": "Person",
-    "givenName": "Alice",
-    "lastName": "LAST NAME",
-    "knows": [{
-      "@type": "Person",
-      "givenName": "Bob",
-      "familyName": "Rodriguez"
-    }, {
-      "givenName": "Carol",
-      "lastName": "Durveuax"
-    }, {
-      "@id": "zuko"
-    }]
+    "title": "Headline 2",
+    "author": "Bob Ezekial"
   }]
 }
 
@@ -31,11 +20,15 @@ const exampleShapesGraph = {
   "@context": {
     "@base": "http://www.w3.org/ns/shacl#",
     "@vocab": "http://www.w3.org/ns/shacl#",
+    "news": "http://news.org/",
     "schema": "http://schema.org/",
     "xsd": "http://www.w3.org/2001/XMLSchema#",
     "rdf:type": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "id": "@id",
     "type": "@type",
     "targetClass": { "@type": "@id" },
+    "targetSubjectsOf": { "@type": "@id" },
+    "targetObjectsOf": { "@type": "@id" },
     "path": { "@type": "@id" },
     "class": { "@type": "@id" },
     "datatype": { "@type": "@id" },
@@ -45,40 +38,26 @@ const exampleShapesGraph = {
   },
   "@graph": [{
     "type": "NodeShape",
-    "targetClass": "schema:Agent",
-    "property": {
-      "path": "schema:foo",
-      "values": "bar"
-    }
-  }, {
-    "type": "NodeShape",
-    "targetClass": "schema:Person",
-    // "rule": {
-    //   "subject": "this",
-    //   "predicate": "schema:hello",
-    //   "object": "(rule on person)"
-    // },
+    "targetSubjectsOf": "news:articles",
     "property": [{
-      "type": "PropertyShape",
-      "path": "schema:givenName",
-      "values": "Alice"
+      "path": "rdf:type",
+      "values": {
+        "id": "schema:ItemList"
+      }
     }, {
-      "type": "PropertyShape",
-      "path": "schema:familyName",
-      "values": { "path": "schema:lastName" }
-    }, {
-      "type": "PropertyShape",
-      "path": "schema:knows",
-      "class": "schema:Person",
+      "path": "schema:itemListElement",
+      "values": {
+        "path": "news:articles"
+      },
       "property": [{
         "path": "rdf:type",
         "values": {
-          "@id": "schema:Person"
+          "id": "schema:Article"
         }
       }, {
-        "path": "schema:test",
+        "path": "schema:headline",
         "values": {
-          "path": "schema:givenName"
+          "path": "news:title"
         }
       }]
     }]
