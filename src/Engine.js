@@ -443,17 +443,41 @@ export class SHACLEngine extends SHACL {
 
     this._inferredGraph = inferredGraph
 
-    const formattedInferredGraph = await jsonld.compact({
+    const pass1 = await jsonld.compact({
       "@context": {
         "id": "@id",
         "type": "@type"
       },
       "@graph": [...new Set(inferredGraph.map(item => JSON.stringify(item)))].map(item => JSON.parse(item)).filter(({ id }) => !id || this.$data.id === id)
     }, {
+      "@context": {
+        ...this.originalDataGraph["@context"],
+        "rdf:type": { "@type": "@id", "@id": "@type" }
+      }
+    })
+
+    const pass2 = await jsonld.flatten(pass1, {
+      "@context": {
+        ...this.originalDataGraph["@context"],
+        "rdf:type": { "@type": "@id", "@id": "@type" }
+      }
+    })
+
+    const pass3 = await jsonld.expand(pass2, {
       "@context": this.originalDataGraph["@context"]
     })
 
-    this.inferredGraph = formattedInferredGraph
+    const pass4 = await jsonld.frame(pass2, {
+      "@context": {
+        ...this.originalDataGraph["@context"]
+      }
+    })
+
+    const pass5 = await jsonld.compact(pass4, {
+      "@context": this.originalDataGraph["@context"]
+    })
+
+    this.inferredGraph = pass5
     
     return this.inferredGraph
   }

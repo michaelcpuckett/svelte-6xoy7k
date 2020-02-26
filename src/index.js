@@ -33,6 +33,7 @@ const exampleShapesGraph = {
     "@vocab": "http://www.w3.org/ns/shacl#",
     "schema": "http://schema.org/",
     "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "rdf:type": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
     "type": "@type",
     "targetClass": { "@type": "@id" },
     "path": { "@type": "@id" },
