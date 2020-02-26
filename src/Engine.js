@@ -129,7 +129,6 @@ class SHACL {
   async inferFromRule(type, rule, target, focusNode) {
     const Component = await this.getRuleComponent(type, focusNode)
     if (Component) {
-      // console.log('HAS COMPONENT', Component)
       const component = Component._values ? Component : new Component(rule)
       return component.infer(target, focusNode)
     } else {
@@ -191,10 +190,13 @@ class PropertyConstraintComponent extends ConstraintComponent {
       throw new Error('NO PATH')
     }
   }
-  async validate(target) {
-    const validationResult = await this.validateShape(this._constraint, target, this._constraint.path.id)
+  async validate(target, focusNode) {
+    const nextTargets = typeof target[this._constraint.path.id] === 'object' ? Array.isArray(target[this._constraint.path.id]) ? target[this._constraint.path.id] : [target[this._constraint.path.id]] : [target]
+    const validationResult = await Promise.all(nextTargets.map(async target => await this.validateShape(this._constraint, target, this._constraint.path.id)))
+
     return {
       component: this,
+      focusNode,
       target,
       validationResult: Array.isArray(validationResult) ? validationResult.flat(Infinity) : validationResult
     }
@@ -208,6 +210,8 @@ class HasValueConstraintComponent extends ConstraintComponent {
   async validate(target, focusNode) {
     return {
       component: this,
+      focusNode,
+      target,
       validationResult: target[focusNode] === this._constraint
     }
   }
@@ -220,6 +224,8 @@ class ClassConstraintComponent extends ConstraintComponent {
   async validate(target, focusNode) {
     return {
       component: this,
+      focusNode,
+      target,
       validationResult: target.type === this._constraint.id
     }
   }
@@ -232,6 +238,8 @@ class MinCountConstraintComponent extends ConstraintComponent {
   async validate(target, focusNode) {
     return {
       component: this,
+      focusNode,
+      target,
       validationResult: (this._constraint === 1 && !Array.isArray(target[focusNode]) && (target[focusNode] || target[focusNode] !== false)) || (Array.isArray(target[focusNode]) && target[focusNode].length >= this._constraint)
     }
   }
@@ -244,6 +252,8 @@ class MaxCountConstraintComponent extends ConstraintComponent {
   async validate(target, focusNode) {
     return {
       component: this,
+      focusNode,
+      target,
       validationResult: Array.isArray(target[focusNode]) && (target[focusNode].length <= this._constraint)
     }
   }
@@ -256,6 +266,8 @@ class MinLengthConstraintComponent extends ConstraintComponent {
   async validate(target, focusNode) {
     return {
       component: this,
+      focusNode,
+      target,
       validationResult: typeof target[focusNode] === 'string' && target[focusNode].length >= this._constraint
     }
   }
@@ -268,6 +280,8 @@ class MaxLengthConstraintComponent extends ConstraintComponent {
   async validate(target, focusNode) {
     return {
       component: this,
+      focusNode,
+      target,
       validationResult: typeof target[focusNode] === 'string' && target[focusNode].length <= this._constraint
     }
   }
@@ -280,6 +294,8 @@ class DatatypeConstraintComponent extends ConstraintComponent {
   async validate(target, focusNode) {
     return {
       component: this,
+      focusNode,
+      target,
       validationResult: typeof target[focusNode] === this._constraint.id.split('../2001/XMLSchema#')[1]
     }
   }
@@ -349,10 +365,12 @@ class ValuesComponent {
     this._values = values
   }
   async infer(target, focusNode) {
-    if (this._values.path) {
-      target[focusNode.path.id] = target[this._values.path.id]
-    } else {
-      target[focusNode.path.id] = this._values
+    if (!target[focusNode.path.id]) {
+      if (this._values.path) {
+        target[focusNode.path.id] = target[this._values.path.id]
+      } else {
+        target[focusNode.path.id] = this._values
+      }
     }
     return target
   }
@@ -382,13 +400,15 @@ export class SHACLEngine extends SHACL {
     const {
       "@context": shapesContext,
       ...shapes
-    } = await jsonld.compact(this.originalShapesGraph, {
+    } = await jsonld.frame(this.originalShapesGraph, {
       "@context": {
         "@base": "http://www.w3.org/ns/shacl#",
         "@vocab": "http://www.w3.org/ns/shacl#",
         "id": "@id",
         "type": "@type"
       }
+    }, {
+      embed: true
     })
 
     const $shapes = shapes["@graph"] || [shapes]
@@ -399,25 +419,61 @@ export class SHACLEngine extends SHACL {
   async infer() {
     const ruleOrders = [0]
     const results = await Promise.all(ruleOrders.map(async ruleOrder => await this.getInferenceResults(ruleOrder)))
-
     const {
       "@graph": inferredGraph
-    } = await jsonld.compact({
-      "@context": this.originalDataGraph["@context"],
+    } = await jsonld.frame({
+      "@context": {
+        "id": "@id",
+        "type": "@type"
+      },
       "@graph": results
+    }, {
+      "@context": {
+        "id": "@id",
+        "type": "@type"
+      }
+    })
+
+    const formattedGraph = await jsonld.compact({
+      "@context": {
+        "id": "@id",
+        "type": "@type"
+      },
+      "@graph": [...new Set(inferredGraph.map(item => JSON.stringify(item)))].map(item => JSON.parse(item)).filter(({ id }) => !id || this.$data.id === id)
     }, {
       "@context": this.originalDataGraph["@context"]
     })
-    this.inferredGraph = [...new Set(inferredGraph.map(item => JSON.stringify(item)))].map(item => JSON.parse(item)).filter(({ id }) => !id || this.$data.id === id)
+
+    this.inferredGraph = formattedGraph    
+    
     return this.inferredGraph
   }
   async validate() {
-    const report = await this.getValidationResults()
-    const conforms = report ? !report.find(result => result !== true) : true
+    const find = result =>
+      result !== true ||
+      (Array.isArray(result) && result.find(find))
+
+    const filter = ({ validationResult }) =>
+      !validationResult ||
+      (
+        Array.isArray(validationResult) &&
+        validationResult
+          .find(find)
+      )
+
+    const filterAll = ({ validationResult }) =>
+      !validationResult ||
+      (
+        Array.isArray(validationResult) &&
+        validationResult
+          .find(filter)
+      )
+    const report = (await this.getValidationResults()).flat(Infinity).filter(filter).map(filterAll).filter(_ => _)
+    const conforms = report ? !report.length : true
 
     this.validationReport = {
       conforms,
-      report
+      ...(report.length ? { report } : null)
     }
 
     return this.validationReport
