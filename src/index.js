@@ -19,7 +19,6 @@ const exampleDataGraph = {
       "givenName": "Bob",
       "familyName": "Rodriguez"
     }, {
-      "@type": "Agent",
       "givenName": "Carol",
       "lastName": "Durveuax"
     }, {
@@ -71,6 +70,11 @@ const exampleShapesGraph = {
       "path": "schema:knows",
       "class": "schema:Person",
       "property": [{
+        "path": "rdf:type",
+        "values": {
+          "@id": "schema:Person"
+        }
+      }, {
         "path": "schema:test",
         "values": {
           "path": "schema:givenName"
