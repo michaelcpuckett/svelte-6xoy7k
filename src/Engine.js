@@ -134,11 +134,20 @@ class SHACL {
       { property }
     ].filter(obj => Object.values(obj).find(_ => _))
   }
-  async inferFromRule(type, rule, target, focusNode) {
+  async getOrderFromRule(type, rule, target, focusNode) {
     const Component = await this.getRuleComponent(type, focusNode)
     if (Component) {
       const component = Component._values ? Component : new Component(rule)
-      return component.infer(target, focusNode)
+      return component.getOrder(target, focusNode)
+    } else {
+      console.log('NO COMPONENT FOUND')
+    }
+  }
+  async inferFromRule(type, rule, target, focusNode, order) {
+    const Component = await this.getRuleComponent(type, focusNode)
+    if (Component) {
+      const component = Component._values ? Component : new Component(rule)
+      return component.infer(target, focusNode, order)
     } else {
       console.log('NO COMPONENT FOUND')
     }
@@ -147,21 +156,36 @@ class SHACL {
     const component = new (await this.getConstraintComponent(type))(constraint)
     return component.validate(target, focusNode)
   }
-  async inferShape(shape, data, focusNode) {
+  async getOrderFromShape(shape, data, focusNode) {
     const rulesByType = await this.getRulesByType(shape)
-    return await this.getInferenceResult([data], rulesByType, focusNode)
+    return await this.getInferenceOrder([data], rulesByType, focusNode)
+  }
+  async inferShape(shape, data, focusNode, order) {
+    const rulesByType = await this.getRulesByType(shape)
+    return await this.getInferenceResult([data], rulesByType, focusNode, order)
   }
   async validateShape(shape, data, focusNode) {
     const constraintsByType = await this.getConstraintsByType(shape)
     return await this.getValidationResult([data], constraintsByType, focusNode)
   }
-  async getInferenceResult(matchedTargets, rulesByType, focusNode) {
+  async getInferenceOrder(matchedTargets, rulesByType, focusNode) {
     return (rulesByType && rulesByType.length) ? (await Promise.all(matchedTargets.map(async target => {
       return await Promise.all(rulesByType.map(async rulesOfType => await Promise.all(Object.entries(rulesOfType).map(async ([ type, rules ]) => {
         if (type === 'property') {
-          return await Promise.all((Array.isArray(rules) ? rules : [rules]).map(async rule => await this.inferFromRule(type, rule, target, (Array.isArray(focusNode.property) ? focusNode.property : [focusNode.property]).find(({ path }) => path.id === rule.path.id))))
+          return await Promise.all((Array.isArray(rules) ? rules : [rules]).map(async rule => await this.getOrderFromRule(type, rule, target, (Array.isArray(focusNode.property) ? focusNode.property : [focusNode.property]).find(({ path }) => path.id === rule.path.id))))
         } else {
-          return await this.inferFromRule(type, rules, target, focusNode)
+          return await this.getOrderFromRule(type, rules, target, focusNode)
+        }
+      }))))
+    }))) : 0
+  }
+  async getInferenceResult(matchedTargets, rulesByType, focusNode, order) {
+    return (rulesByType && rulesByType.length) ? (await Promise.all(matchedTargets.map(async target => {
+      return await Promise.all(rulesByType.map(async rulesOfType => await Promise.all(Object.entries(rulesOfType).map(async ([ type, rules ]) => {
+        if (type === 'property') {
+          return await Promise.all((Array.isArray(rules) ? rules : [rules]).map(async rule => await this.inferFromRule(type, rule, target, (Array.isArray(focusNode.property) ? focusNode.property : [focusNode.property]).find(({ path }) => path.id === rule.path.id), order)))
+        } else {
+          return await this.inferFromRule(type, rules, target, focusNode, order)
         }
       }))))
     }))) : true
@@ -197,10 +221,18 @@ class PropertyConstraintComponent extends ConstraintComponent {
   constructor(constraint) {
     super(constraint)
   }
-  async infer(target, focusNode) {
+  async getOrder(target, focusNode) {
     if (this.constraint.path) {
       const nextTargets = typeof target[focusNode.path.id] === 'object' ? Array.isArray(target[focusNode.path.id]) ? target[focusNode.path.id] : [target[focusNode.path.id]] : [target]
-      return await Promise.all(nextTargets.map(async target => await this.inferShape(this.constraint, target, focusNode)))
+      return await Promise.all(nextTargets.map(async target => await this.getOrderFromShape(this.constraint, target, focusNode)))
+    } else {
+      throw new Error('NO PATH')
+    }
+  }
+  async infer(target, focusNode, order) {
+    if (this.constraint.path) {
+      const nextTargets = typeof target[focusNode.path.id] === 'object' ? Array.isArray(target[focusNode.path.id]) ? target[focusNode.path.id] : [target[focusNode.path.id]] : [target]
+      return await Promise.all(nextTargets.map(async target => await this.inferShape(this.constraint, target, focusNode, order)))
     } else {
       throw new Error('NO PATH')
     }
@@ -362,8 +394,14 @@ class RuleComponent {
   constructor(rule) {
     this._rule = rule
   }
-  async infer(target) {
+  async getOrder(target) {
+    return Math.max(target.order || 0, this._rule.order || 0)
+  }
+  async infer(target, focusNode, order) {
     const subject = this._rule.subject.id === 'this' ? target : target[this._rule.subject.path.id]
+    if (order !== await this.getOrder(target))  {
+      return subject
+    }
     if (!subject[this._rule.predicate.id]) {
       if (this._rule.object.path) {
         subject[this._rule.predicate.id] = subject[this._rule.object.path.id]
@@ -379,7 +417,13 @@ class ValuesComponent {
   constructor(values) {
     this._values = values
   }
-  async infer(target, focusNode) {
+  async getOrder(_, focusNode) {
+    return focusNode.order || 0
+  }
+  async infer(target, focusNode, order) {
+    if (order !== await this.getOrder(target, focusNode))  {
+      return target
+    }
     if (!target[focusNode.path.id]) {
       if (this._values.path) {
         target[focusNode.path.id] = target[this._values.path.id]
@@ -431,24 +475,31 @@ export class SHACLEngine extends SHACL {
     this.$shapes = shapes["@graph"] || [shapes]
   }
   async infer() {
-    const ruleOrders = [0]
-    const results = await Promise.all(ruleOrders.map(async ruleOrder => await this.getInferenceResults(ruleOrder)))
-    const {
-      "@graph": inferredGraph
-    } = await jsonld.frame({
-      "@context": {
-        "id": "@id",
-        "type": "@type"
-      },
-      "@graph": results
-    }, {
-      "@context": {
-        "id": "@id",
-        "type": "@type"
-      }
-    }, {
-      embed: true
-    })
+    const ruleOrders = [...new Set((await this.getInferenceOrderList()).flat(Infinity))]
+
+    const results = ruleOrders.reduce(async (promise, order) => {
+      const prev = await promise
+      const thisResult = await this.getInferenceResults(order, prev)
+      const {
+        "@graph": inferredGraph
+      } = await jsonld.frame({
+        "@context": {
+          "id": "@id",
+          "type": "@type"
+        },
+        "@graph": thisResult
+      }, {
+        "@context": {
+          "id": "@id",
+          "type": "@type"
+        }
+      }, {
+        embed: true
+      })
+      return inferredGraph
+    }, new Promise(resolve => resolve(this.$data)))
+
+    const inferredGraph = await results
 
     this._inferredGraph = inferredGraph
 
@@ -546,11 +597,20 @@ export class SHACLEngine extends SHACL {
       return (await this.getValidationResult(matchedTargets, constraintsByType, node))
     }))
   }
-  async getInferenceResults(order) {
+  async getInferenceOrderList() {
     const nodesWithTargets = (await Promise.all(this.$shapes.map(async node => [await this.getTargets(node), node]))).map(([hasTargets, node]) => hasTargets ? node : null).filter(_ => _)
     return await Promise.all(nodesWithTargets.map(async node => {
       const targets = await this.getTargets(node)
       const matchedTargets = await this.matchTargets(targets, JSON.parse(JSON.stringify(this.$data)))
+      const rulesByType = await this.getRulesByType(node)
+      return await this.getInferenceOrder(matchedTargets, rulesByType, node)
+    }))
+  }
+  async getInferenceResults(order, data) {
+    const nodesWithTargets = (await Promise.all(this.$shapes.map(async node => [await this.getTargets(node), node]))).map(([hasTargets, node]) => hasTargets ? node : null).filter(_ => _)
+    return await Promise.all(nodesWithTargets.map(async node => {
+      const targets = await this.getTargets(node)
+      const matchedTargets = await this.matchTargets(targets, JSON.parse(JSON.stringify(data)))
       const rulesByType = await this.getRulesByType(node)
       return await this.getInferenceResult(matchedTargets, rulesByType, node, order)
     }))

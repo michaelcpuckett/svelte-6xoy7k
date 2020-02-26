@@ -51,11 +51,13 @@ const exampleShapesGraph = {
       },
       "property": [{
         "path": "rdf:type",
+        "order": 1,
         "values": {
           "id": "schema:Article"
         }
       }, {
         "path": "schema:headline",
+        "order": 1,
         "values": {
           "path": "news:title"
         }
