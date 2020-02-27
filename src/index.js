@@ -8,6 +8,7 @@ const exampleDataGraph = {
     // "id": "@id",
     // "type": "@type"
   },
+  "@id": "myList",
   "@type": "List",
   "length": 2,
   "articles": [{

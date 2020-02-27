@@ -576,7 +576,7 @@ export class SHACLEngine extends SHACL {
       "@graph": dataGraph
     } = {
       "@context": c,
-      "@graph": g.filter(({ "@id": id }) => !id || (id && !id.startsWith('_:b') && originalIDs.includes(id)))
+      "@graph": g//.filter(({ "@id": id }) => !id || (id && !id.startsWith('_:b') && originalIDs.includes(id)))
     }
 
     this.inferredGraph = await jsonld.frame({
