@@ -41,12 +41,16 @@ const exampleShapesGraph = {
   },
   "@graph": [{
     "type": "NodeShape",
-    "targetSubjectsOf": "news:articles",
-    "property": [{
+    "targetSubjectsOf": "schema:itemListElement",
+    "property": {
       "path": "news:articles",
       "order": 2,
       "values": "test"
-    }, {
+    }
+  }, {
+    "type": "NodeShape",
+    "targetSubjectsOf": "news:articles",
+    "property": [{
       "path": "rdf:type",
       "values": {
         "id": "schema:ItemList"
