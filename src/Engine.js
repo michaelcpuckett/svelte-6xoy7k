@@ -233,16 +233,18 @@ class PropertyConstraintComponent extends ConstraintComponent {
   async infer(target, focusNode, order) {
     if (this.constraint.path) {
       const path = focusNode.path.id === 'rdf:type' ? 'type' : focusNode.path.id
-      const nextTargets = typeof target[path] === 'object' ? Array.isArray(target[path]) ? target[path] : [target[path]] : [target]
-      if (typeof target[path] === 'object') {
-        // console.log('obj', this.constraint, nextTargets)
+      const nextTargets = [target, ...typeof target[path] === 'object' ? Array.isArray(target[path]) ? target[path] : [target[path]] : []]
+      if (!target[path]) {
+        // console.log(this.constraint.id === focusNode.id, { constraint: this.constraint, nextTargets, focusNode })
+      } else {
+        // console.log(this.constraint.id === focusNode.id)
       }
       if (!target[path]) {
-        console.log({ target, nextTargets, path, originalPath: focusNode.path.id, focusNode, order, constraint: this.constraint })
+        // console.log({ target, nextTargets, path, originalPath: focusNode.path.id, focusNode, order, constraint: this.constraint })
       } else {
-        console.log('...', [{ target, nextTargets, path, originalPath: focusNode.path.id, focusNode, order, constraint: this.constraint }])
+        // console.log('...', [{ target, nextTargets, path, originalPath: focusNode.path.id, focusNode, order, constraint: this.constraint }])
       }
-      return await Promise.all(nextTargets.map(async target => await this.inferShape(this.constraint, target, focusNode, order)))
+      return await this.inferShape(this.constraint, nextTargets, focusNode, order)
     } else {
       throw new Error('NO PATH')
     }
@@ -436,6 +438,7 @@ class ValuesComponent {
     }
     target = target ? JSON.parse(JSON.stringify(target)) : target
     const path = focusNode.path.id === 'rdf:type' ? 'type' : focusNode.path.id
+    console.log({ path, target, focusNode, values: this.values })
     // console.log('values', JSON.parse(JSON.stringify({ values: this.values, target, focusNode })))
     // console.log(this.values, target, focusNode.path.id)
     // if (!target[focusNode.path.id]) {
