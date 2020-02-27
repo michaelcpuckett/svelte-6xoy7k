@@ -476,18 +476,15 @@ export class SHACLEngine extends SHACL {
   }
   async infer() {
     const ruleOrders = [...new Set((await this.getInferenceOrderList()).flat(Infinity))]
-
-    const results = ruleOrders.reduce(async (promise, order) => {
+    const results = await ruleOrders.reduce(async (promise, order) => {
       const prev = await promise
       const thisResult = await this.getInferenceResults(order, prev)
-      const {
-        "@graph": inferredGraph
-      } = await jsonld.frame({
+      const inferredGraph = await jsonld.frame({
         "@context": {
           "id": "@id",
           "type": "@type"
         },
-        "@graph": thisResult
+        "@graph": [...this.$data, thisResult]
       }, {
         "@context": {
           "id": "@id",
@@ -496,10 +493,10 @@ export class SHACLEngine extends SHACL {
       }, {
         embed: true
       })
-      return inferredGraph
-    }, new Promise(resolve => resolve(this.$data)))
+      return inferredGraph["@graph"]
+    }, this.$data)
 
-    const inferredGraph = await results
+    const inferredGraph = results
 
     this._inferredGraph = inferredGraph
 
@@ -610,7 +607,7 @@ export class SHACLEngine extends SHACL {
     const nodesWithTargets = (await Promise.all(this.$shapes.map(async node => [await this.getTargets(node), node]))).map(([hasTargets, node]) => hasTargets ? node : null).filter(_ => _)
     return await Promise.all(nodesWithTargets.map(async node => {
       const targets = await this.getTargets(node)
-      const matchedTargets = await this.matchTargets(targets, JSON.parse(JSON.stringify(data)))
+      const matchedTargets = await this.matchTargets(targets, data)
       const rulesByType = await this.getRulesByType(node)
       return await this.getInferenceResult(matchedTargets, rulesByType, node, order)
     }))

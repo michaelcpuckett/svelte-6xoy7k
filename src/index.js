@@ -61,6 +61,12 @@ const exampleShapesGraph = {
         "values": {
           "path": "news:title"
         }
+      }, {
+        "path": "schema:author",
+        "order": 2,
+        "values": {
+          "path": "news:author"
+        }
       }]
     }]
   }]
