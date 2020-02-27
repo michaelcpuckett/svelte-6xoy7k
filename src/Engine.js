@@ -435,6 +435,12 @@ class ValuesComponent {
     }
     target = target ? JSON.parse(JSON.stringify(target)) : target
     let path = focusNode.path.id === 'rdf:type' ? 'type' : focusNode.path.id
+
+    if (path === 'type' || path === '@type') {
+      // console.log(target, this.values.id)
+      target["@type"] = [ this.values.id ]
+      return target
+    }
     // if (typeof target === 'object' && target["@value"]) {
     //   path = '@value'
     // }
@@ -505,7 +511,7 @@ export class SHACLEngine extends SHACL {
       const prev = JSON.parse(JSON.stringify([...new Set(p.map(node => JSON.stringify(node)))].map(node => JSON.parse(node))))
       // console.log(prev)
       const thisResult = await this.getInferenceResults(order, prev)
-      console.log({ thisResult: Object.fromEntries(thisResult.flat(Infinity).map(node => Object.entries(node).flat(Infinity)).filter(node => node && node.filter(node => node && node["@value"])).map(node => [node[1], node])) })
+      console.log({ thisResult: thisResult.flat(Infinity) })//.map(item => item["@type"]) })//Object.fromEntries(thisResult.flat(Infinity).map(node => Object.entries(node).flat(Infinity)).filter(node => node && node.filter(node => node && node["@value"])).map(node => [node[1], node])) })
       const inferredGraph = await jsonld.expand({
         "@context": {
           "id": "@id",
