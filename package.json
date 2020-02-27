@@ -1,6 +1,11 @@
 {
   "dependencies": {
+    "deep-object-diff": "^1.1.0",
     "jsonld": "2.0.2"
   },
-  "type": "module"
+  "type": "module",
+  "devDependencies": {
+    "webpack": "^4.41.6",
+    "webpack-cli": "^3.3.11"
+  }
 }

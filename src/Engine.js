@@ -1,5 +1,5 @@
-// import jsonld from 'jsonld'
-import '../node_modules/jsonld/dist/jsonld.js' 
+import jsonld from 'jsonld'
+// import '../node_modules/jsonld/dist/jsonld.js' 
 
 class SHACL {
   async getConstraintComponent(type) {

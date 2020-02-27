@@ -1,4 +1,5 @@
 import { SHACLEngine } from './Engine.js'
+import * as diff from 'deep-object-diff'
 
 const exampleDataGraph = {
   "@context": {
@@ -13,7 +14,8 @@ const exampleDataGraph = {
   }, {
     "title": "Headline 2",
     "author": "Bob Ezekial"
-  }]
+  }],
+  "foo": "bar"
 }
 
 const exampleShapesGraph = {
@@ -79,4 +81,5 @@ const exampleShapesGraph = {
   await engine.validate()
   console.log(engine.validationReport)
   console.log(engine.inferredGraph)
+  console.log(diff.addedDiff(engine.originalDataGraph, engine.inferredGraph))
 })()
