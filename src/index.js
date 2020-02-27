@@ -8,6 +8,7 @@ const exampleDataGraph = {
     // "id": "@id",
     // "type": "@type"
   },
+  "length": 2,
   "articles": [{
     "title": "Headline 1",
     "author": "Alice Jones"
@@ -42,6 +43,10 @@ const exampleShapesGraph = {
     "type": "NodeShape",
     "targetSubjectsOf": "news:articles",
     "property": [{
+      "path": "news:articles",
+      "order": 2,
+      "values": "test"
+    }, {
       "path": "rdf:type",
       "values": {
         "id": "schema:ItemList"
@@ -65,7 +70,7 @@ const exampleShapesGraph = {
         }
       }, {
         "path": "schema:author",
-        "order": 2,
+        "order": 1,
         "values": {
           "path": "news:author"
         }
@@ -81,5 +86,5 @@ const exampleShapesGraph = {
   await engine.validate()
   console.log(engine.validationReport)
   console.log(engine.inferredGraph)
-  console.log(diff.addedDiff(engine.originalDataGraph, engine.inferredGraph))
+  // console.log(diff.addedDiff(engine.originalDataGraph, engine.inferredGraph))
 })()
