@@ -27,6 +27,7 @@ const exampleShapesGraph = {
     "schema": "http://schema.org/",
     "xsd": "http://www.w3.org/2001/XMLSchema#",
     "rdf:type": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "mz": "http://muzzle.network/",
     "id": "@id",
     "type": "@type",
     "targetClass": { "@type": "@id" },
@@ -40,9 +41,22 @@ const exampleShapesGraph = {
     "predicate": { "@type": "@id" }
   },
   "@graph": [{
+    "id": "mz:insertBlankNode",
+    "type": "JSFunction",
+    "jsLibrary": {
+      "jsLibraryURL": "https://shacl-js-rule-test.firebaseapp.com/utilities.js"
+    },
+    "jsFunctionName": "insertBlankNode"
+  }, {
     "type": "NodeShape",
     "targetSubjectsOf": "news:articles",
     "property": [{
+      "path": "news:articles",
+      "order": 2,
+      "values": {
+        "mz:insertBlankNode": { "@list": [] }
+      }
+    }, {
       "path": "rdf:type",
       "values": {
         "id": "schema:ItemList"
@@ -59,9 +73,17 @@ const exampleShapesGraph = {
           "id": "schema:Article"
         }
       }, {
-        "path": "news:headline",
+        "path": "news:title",
         "order": 2,
-        "values": null
+        "values": {
+          "mz:insertBlankNode": { "@list": [] }
+        }
+      }, {
+        "path": "news:author",
+        "order": 2,
+        "values": {
+          "mz:insertBlankNode": { "@list": [] }
+        }
       }, {
         "path": "schema:headline",
         "order": 1,

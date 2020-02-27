@@ -478,8 +478,8 @@ export class SHACLEngine extends SHACL {
     this.$shapes = shapes["@graph"] || [shapes]
   }
   async infer() {
-    const ruleOrders = [...new Set((await this.getInferenceOrderList()).flat(Infinity))]
-    console.log(ruleOrders)
+    const ruleOrders = [0,1,2]// [...new Set((await this.getInferenceOrderList()).flat(Infinity))]
+    // console.log(ruleOrders, await this.getInferenceOrderList())
     const results = await ruleOrders.reduce(async (promise, order) => {
       const p = await promise
       console.log('p', p)
