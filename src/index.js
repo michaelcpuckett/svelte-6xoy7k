@@ -54,20 +54,21 @@ const exampleShapesGraph = {
   }, {
     "type": "NodeShape",
     "targetSubjectsOf": "news:articles",
-    "property": [/*{
+    "property": [{
       "path": "news:articles",
-      "order": 2,
-      "condition": {
-        "path": "rdf:type",
-        "hasValue": "schema:ItemList"
-      },
-      "values": " test!! should only appear on root!! "
-    }, {
-      "path": "rdf:type",
-      "values": {
-        "id": "schema:ItemList"
-      }
-    }, */{
+      // "order": 2,
+      // "condition": {
+      //   "path": "rdf:type",
+      //   "hasValue": "schema:ItemList"
+      // },
+      // "values": " test!! should only appear on root!! "
+    }, //{
+      // "path": "rdf:type",
+      // "values": {
+      //   "id": "schema:ItemList"
+      // }
+    //},
+    {
       "path": "schema:itemListElement",
       "values": {
         "path": "news:articles"
@@ -78,7 +79,7 @@ const exampleShapesGraph = {
         "values": {
           "id": "schema:Article"
         }
-      },*/ {
+      }, */{
         "path": "news:title",
         "order": 2,
         "values": "mz:insertBlankNode"
