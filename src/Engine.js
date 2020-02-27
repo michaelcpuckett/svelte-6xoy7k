@@ -27,7 +27,7 @@ class SHACL {
     }
   }
   async matchTargets(targets, $data) {
-    console.log($data)
+    // console.log($data)
     if (targets.find(({ targetNode }) => targetNode)) {
       const targetNode = targets.find(({ targetNode }) => targetNode).targetNode.id
       return $data.filter(({ id }) => id === targetNode)
@@ -232,14 +232,23 @@ class PropertyConstraintComponent extends ConstraintComponent {
   }
   async infer(target, focusNode, order) {
     if (this.constraint.path) {
-      const nextTargets = typeof target[focusNode.path.id] === 'object' ? Array.isArray(target[focusNode.path.id]) ? target[focusNode.path.id] : [target[focusNode.path.id]] : [target]
+      const path = focusNode.path.id === 'rdf:type' ? 'type' : focusNode.path.id
+      const nextTargets = typeof target[path] === 'object' ? Array.isArray(target[path]) ? target[path] : [target[path]] : [target]
+      if (typeof target[path] === 'object') {
+        // console.log('obj', this.constraint, nextTargets)
+      }
+      if (!target[path]) {
+        console.log({ target, nextTargets, path, originalPath: focusNode.path.id, focusNode, order, constraint: this.constraint })
+      } else {
+        console.log('...', [{ target, nextTargets, path, originalPath: focusNode.path.id, focusNode, order, constraint: this.constraint }])
+      }
       return await Promise.all(nextTargets.map(async target => await this.inferShape(this.constraint, target, focusNode, order)))
     } else {
       throw new Error('NO PATH')
     }
   }
   async validate(target, focusNode) {
-    const nextTargets = typeof target[this.constraint.path.id] === 'object' ? Array.isArray(target[this.constraint.path.id]) ? target[this.constraint.path.id] : [target[this.constraint.path.id]] : [target]
+    const nextTargets = [target, ...typeof target[this.constraint.path.id] === 'object' ? Array.isArray(target[this.constraint.path.id]) ? target[this.constraint.path.id] : [target[this.constraint.path.id]] : []]
     const validationResult = await Promise.all(nextTargets.map(async target => await this.validateShape(this.constraint, target, this.constraint.path.id)))
 
     return {
@@ -393,21 +402,21 @@ class NodeKindConstraintComponent extends ConstraintComponent {
 
 class RuleComponent {
   constructor(rule) {
-    this._rule = rule
+    this.rule = rule
   }
   async getOrder(target) {
-    return Math.max(target.order || 0, this._rule.order || 0)
+    return Math.max(target.order || 0, this.rule.order || 0)
   }
   async infer(target, focusNode, order) {
-    const subject = this._rule.subject.id === 'this' ? target : target[this._rule.subject.path.id]
+    const subject = this.rule.subject.id === 'this' ? target : target[this.rule.subject.path.id]
     if (order !== await this.getOrder(target))  {
       return subject
     }
-    if (!subject[this._rule.predicate.id]) {
-      if (this._rule.object.path) {
-        subject[this._rule.predicate.id] = subject[this._rule.object.path.id]
+    if (!subject[this.rule.predicate.id]) {
+      if (this.rule.object.path) {
+        subject[this.rule.predicate.id] = subject[this.rule.object.path.id]
       } else {
-        subject[this._rule.predicate.id] = this._rule.object
+        subject[this.rule.predicate.id] = this.rule.object
       }
     }
     return subject
@@ -416,7 +425,7 @@ class RuleComponent {
 
 class ValuesComponent {
   constructor(values) {
-    this._values = values
+    this.values = values
   }
   async getOrder(_, focusNode) {
     return focusNode.order || 0
@@ -425,13 +434,15 @@ class ValuesComponent {
     if (order !== await this.getOrder(target, focusNode))  {
       return target
     }
-    console.log('values', JSON.parse(JSON.stringify({ values: this._values, target, focusNode })))
-    // console.log(this._values, target, focusNode.path.id)
+    target = target ? JSON.parse(JSON.stringify(target)) : target
+    const path = focusNode.path.id === 'rdf:type' ? 'type' : focusNode.path.id
+    // console.log('values', JSON.parse(JSON.stringify({ values: this.values, target, focusNode })))
+    // console.log(this.values, target, focusNode.path.id)
     // if (!target[focusNode.path.id]) {
-      if (this._values.path) {
-        target[focusNode.path.id] = JSON.parse(JSON.stringify(target[this._values.path.id]))
+      if (this.values.path) {
+        target[path] = target[this.values.path.id]
       } else {
-        target[focusNode.path.id] = this._values
+        target[path] = focusNode.path.id === 'rdf:type' ? this.values.id : this.values
       }
     // }
     return target
@@ -482,11 +493,12 @@ export class SHACLEngine extends SHACL {
     // console.log(ruleOrders, await this.getInferenceOrderList())
     const results = await ruleOrders.reduce(async (promise, order) => {
       const p = await promise
-      console.log('p', p)
-      const prev = JSON.parse(JSON.stringify([...new Set(p["@graph"].map(node => JSON.stringify(node)))].map(node => JSON.parse(node))))
-      console.log(prev)
+      console.log({ p })
+      const prev = JSON.parse(JSON.stringify([...new Set(p.map(node => JSON.stringify(node)))].map(node => JSON.parse(node))))
+      // console.log(prev)
       const thisResult = await this.getInferenceResults(order, prev)
-      const inferredGraph = await jsonld.frame(await jsonld.flatten({
+      console.log({ thisResult: thisResult.flat(Infinity) })
+      const inferredGraph = await jsonld.expand({
         "@context": {
           "id": "@id",
           "type": "@type"
@@ -495,17 +507,11 @@ export class SHACLEngine extends SHACL {
       }, {
         "@context": {
           "id": "@id",
-          "type": "@type",
-          "rdf:type": { "@type": "@id", "@id": "@type" }
-        }
-      }), {
-        "@context": {
-          "id": "@id",
           "type": "@type"
         }
       })
       return inferredGraph
-    }, await jsonld.frame(await jsonld.expand({
+    }, await jsonld.expand({
       "@context": {
         "id": "@id",
         "type": "@type"
@@ -514,21 +520,22 @@ export class SHACLEngine extends SHACL {
     }, {
       "@context": {
         "id": "@id",
-        "type": "@type",
-        "rdf:type": { "@type": "@id", "@id": "@type" }
-      }
-    }), {
-      "@context": {
-        "id": "@id",
         "type": "@type"
       }
     }))
 
-    console.log(results["@context"])
+    // console.log(results["@context"])
 
-    const inferredGraph = results["@graph"]
+    const inferredGraph = (await jsonld.compact(results, {
+      "@context": {
+        "id": "@id",
+        "type": "@type"
+      }
+    }))["@graph"]
 
     this._inferredGraph = inferredGraph
+
+    console.log({ inferredGraph })
 
     const {
       "@context": c,
@@ -538,7 +545,7 @@ export class SHACLEngine extends SHACL {
         "id": "@id",
         "type": "@type"
       },
-      "@graph": [...new Set(inferredGraph.map(item => JSON.stringify(item)))].map(item => JSON.parse(item)).filter(({ id }) => !id || this.$data.id === id)
+      "@graph": inferredGraph//[...new Set(inferredGraph.map(item => JSON.stringify(item)))].map(item => JSON.parse(item)).filter(({ id }) => !id || this.$data.id === id)
     }, {
       "@context": {
         ...this.originalDataGraph["@context"]
@@ -563,6 +570,7 @@ export class SHACLEngine extends SHACL {
 
     const originalIDs = (_g || [originalData]).filter(({ "@id": id }) => id).map(({ "@id": id }) => id)
 
+    console.log({ g })
     const {
       "@context": finalContext,
       "@graph": dataGraph
@@ -641,7 +649,7 @@ export class SHACLEngine extends SHACL {
       const targets = await this.getTargets(node)
       const matchedTargets = await this.matchTargets(targets, data)
       const rulesByType = await this.getRulesByType(node)
-      console.log({ matchedTargets })
+      // console.log({ matchedTargets })
       return await this.getInferenceResult(matchedTargets, rulesByType, node, order)
     }))
   }

@@ -8,6 +8,7 @@ const exampleDataGraph = {
     // "id": "@id",
     // "type": "@type"
   },
+  "@type": "List",
   "length": 2,
   "articles": [{
     "title": "Headline 1",
@@ -26,7 +27,9 @@ const exampleShapesGraph = {
     "news": "http://news.org/",
     "schema": "http://schema.org/",
     "xsd": "http://www.w3.org/2001/XMLSchema#",
-    "rdf:type": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "rdf:type": {
+      "@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+    },
     "mz": "http://muzzle.network/",
     "id": "@id",
     "type": "@type",
@@ -50,40 +53,38 @@ const exampleShapesGraph = {
   }, {
     "type": "NodeShape",
     "targetSubjectsOf": "news:articles",
-    "property": [{
+    "property": [/*{
       "path": "news:articles",
       "order": 2,
-      "values": {
-        "mz:insertBlankNode": { "@list": [] }
-      }
+      "condition": {
+        "path": "rdf:type",
+        "hasValue": "schema:ItemList"
+      },
+      "values": " test!! should only appear on root!! "
     }, {
       "path": "rdf:type",
       "values": {
         "id": "schema:ItemList"
       }
-    }, {
+    }, */{
       "path": "schema:itemListElement",
       "values": {
         "path": "news:articles"
       },
-      "property": [{
+      "property": [/*{
         "path": "rdf:type",
         "order": 1,
         "values": {
           "id": "schema:Article"
         }
-      }, {
+      },*/ {
         "path": "news:title",
         "order": 2,
-        "values": {
-          "mz:insertBlankNode": { "@list": [] }
-        }
+        "values": "mz:insertBlankNode"
       }, {
         "path": "news:author",
         "order": 2,
-        "values": {
-          "mz:insertBlankNode": { "@list": [] }
-        }
+        "values": "mz:insertBlankNode"
       }, {
         "path": "schema:headline",
         "order": 1,
