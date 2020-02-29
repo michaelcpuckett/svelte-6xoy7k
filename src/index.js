@@ -105,7 +105,8 @@ const exampleShapesGraph = {
       "id": "@id",
       "type": "@type",
       "friendOf": { "@type": "@id" },
-      "friends": { "@type": "@id" }
+      "friends": { "@type": "@id" },
+      "allFriends": { "@type": "@id" }
     },
     "friendOf": { "@type": "@null", "@default": null },
     "friends": { "@type": "@null", "@default": null },
