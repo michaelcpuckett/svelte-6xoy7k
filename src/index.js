@@ -80,8 +80,12 @@ const exampleShapesGraph = {
     "type": "NodeShape",
     "targetSubjectsOf": "ex:firstName",
     "property": {
-      "path": "ex:test",
-      "values": "test"
+      "path": "ex:allFriends",
+      "values": [{
+        "path": "ex:friends"
+      }, {
+        "path": "ex:friendOf"
+      }]
     }
   }]
 }

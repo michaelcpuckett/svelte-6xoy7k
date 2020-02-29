@@ -451,13 +451,23 @@ class ValuesComponent {
     // console.log('values', JSON.parse(JSON.stringify({ values: this.values, target, focusNode })))
     // console.log(this.values, target, focusNode.path.id)
     // if (!target[focusNode.path.id]) {
-      if (this.values.path) {
-        if (target[this.values.path.id]) {
-          target[path] = target[this.values.path.id]
+      ;(Array.isArray(this.values) ? this.values : [this.values]).map(v => {
+        if (v.path) {
+          if (target[v.path.id]) {
+            if (Array.isArray(target[path])) {
+              target[path] = [...target[path], target[v.path.id]]
+            } else {
+              target[path] = target[v.path.id]
+            }
+          }
+        } else {
+          if (Array.isArray(target[path])) {
+            target[path] = [...target[path], focusNode.path.id === 'rdf:type' ? v.id : v]
+          } else {
+            target[path] = focusNode.path.id === 'rdf:type' ? v.id : v
+          }
         }
-      } else {
-        target[path] = focusNode.path.id === 'rdf:type' ? this.values.id : this.values
-      }
+      })
     // }
     return target
   }
@@ -484,6 +494,8 @@ export class SHACLEngine extends SHACL {
 
     this.originalDataContext = dataContext
     this.$data = data["@graph"] || [data]
+
+    console.log(this.$data)
 
     const {
       "@context": shapesContext,
