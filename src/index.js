@@ -1,3 +1,4 @@
+import jsonld from 'jsonld'
 import { SHACLEngine } from './Engine.js'
 import * as diff from 'deep-object-diff'
 
@@ -95,7 +96,23 @@ const exampleShapesGraph = {
   await engine.init()
   await engine.infer()
   await engine.validate()
-  console.log(engine.validationReport)
-  console.log(engine.inferredGraph)
+  // console.log(engine.validationReport)
+  // console.log(engine.inferredGraph)
+  const inferredAndFramed = await jsonld.frame(engine.inferredGraph, {
+    "@context": {
+      "@base": "http://example.org/",
+      "@vocab": "http://example.org/",
+      "id": "@id",
+      "type": "@type",
+      "friendOf": { "@type": "@id" },
+      "friends": { "@type": "@id" }
+    },
+    "friendOf": { "@type": "@null", "@default": null },
+    "friends": { "@type": "@null", "@default": null },
+    "allFriends": { "@embed": false }
+  }, {
+    "omitDefault": true
+  })
+  console.log(inferredAndFramed)
   // console.log(diff.addedDiff(engine.originalDataGraph, engine.inferredGraph))
 })()
