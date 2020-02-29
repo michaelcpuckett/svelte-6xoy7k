@@ -106,15 +106,8 @@ const exampleShapesGraph = {
       "@vocab": "http://example.org/",
       "id": "@id",
       "type": "@type",
-      "friendOf": { "@type": "@id" },
-      "friendsWith": { "@type": "@id" },
-      "friend": { "@type": "@id", "@container": "@set" }
-    },
-    "friendOf": { "@type": "@null", "@default": null },
-    "friendsWith": { "@type": "@null", "@default": null },
-    "friend": {
-      "friendOf": { "@type": "@null", "@default": null },
-      "friendsWith": { "@type": "@null", "@default": null }
+      "friend": { "@type": "@id", "@container": "@set" },
+      "ship": { "@type": "@id", "@container": "@set" }
     }
   }, {
     "explicit": false,
