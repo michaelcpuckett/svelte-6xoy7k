@@ -134,7 +134,8 @@ const exampleShapesGraph = {
       "@vocab": "http://example.org/",
       "id": "@id",
       "type": "@type",
-      "friend": { "@type": "@id", "@container": "@set" }
+      "friend": { "@type": "@id", "@container": "@set" },
+      "ship": { "@type": "@id", "@container": "@set" }
     }
   })
   console.log(inferredAndFramed)
