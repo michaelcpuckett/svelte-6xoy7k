@@ -106,7 +106,7 @@ const exampleShapesGraph = {
   await engine.validate()
   // console.log(engine.validationReport)
   // console.log(engine.inferredGraph)
-  const inferredAndFramed = await jsonld.flatten(engine.inferredGraph, {
+  const inferredAndFramed = await jsonld.frame(engine.inferredGraph, {
     "@context": {
       "@base": "http://example.org/",
       "@vocab": "http://example.org/",
@@ -121,7 +121,8 @@ const exampleShapesGraph = {
     "friend": { "@embed": false }
   }, {
     "explicit": false,
-    // "omitDefault": true,
+    "null": false,
+    "omitDefault": true,
     "requireAll": false
   })
   console.log(inferredAndFramed)
