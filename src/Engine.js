@@ -436,24 +436,24 @@ class ValuesComponent {
     target = target ? JSON.parse(JSON.stringify(target)) : target
     let path = focusNode.path.id === 'rdf:type' ? 'type' : focusNode.path.id
 
-    if (path === 'type' || path === '@type') {
-      // console.log(target, this.values.id)
-      target["@type"] = [ this.values.id ]
-      return target
-    }
+    // if (path === 'type' || path === '@type') {
+    //   // console.log(target, this.values.id)
+    //   target["@type"] = [ this.values.id ]
+    //   return target
+    // }
     // if (typeof target === 'object' && target["@value"]) {
     //   path = '@value'
     // }
     // console.log({ path, target, focusNode, values: this.values })
-    if (target["@value"] && target.length === target.id ? 2 : 1) {
-      return target
-    }
+    // if (target["@value"] && target.length === target.id ? 2 : 1) {
+    //   return target
+    // }
     // console.log('values', JSON.parse(JSON.stringify({ values: this.values, target, focusNode })))
     // console.log(this.values, target, focusNode.path.id)
     // if (!target[focusNode.path.id]) {
       if (this.values.path) {
         if (target[this.values.path.id]) {
-          target[path] = target[this.values.path.id]["@value"] || target[this.values.path.id]
+          target[path] = target[this.values.path.id]
         }
       } else {
         target[path] = focusNode.path.id === 'rdf:type' ? this.values.id : this.values

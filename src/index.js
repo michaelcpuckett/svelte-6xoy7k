@@ -3,37 +3,69 @@ import * as diff from 'deep-object-diff'
 
 const exampleDataGraph = {
   "@context": {
-    "@base": "http://news.org/",
-    "@vocab": "http://news.org/",
-    // "id": "@id",
-    // "type": "@type"
+    "@base": "http://example.org/",
+    "@vocab": "http://example.org/",
+    "id": "@id",
+    "type": "@type",
+    "friends": {
+      "@type": "@id"
+    },
+    "friendOf": {
+      "@type": "@id"
+    }
   },
-  "@id": "myList",
-  "@type": "List",
-  "length": 2,
-  "articles": [{
-    "title": "Headline 1",
-    "author": "Alice Jones"
-  }, {
-    "title": "Headline 2",
-    "author": "Bob Ezekial"
-  }],
-  "foo": "bar"
+  "@graph": [
+    {
+      "id": "HAN",
+      "type": "Human",
+      "firstName": "Han",
+      "friendOf": [
+        "LEIA",
+        "LUKE"
+      ],
+      "lastName": "Solo"
+    },
+    {
+      "id": "LEIA",
+      "type": "Human",
+      "firstName": "Leia",
+      "friendOf": "LUKE",
+      "friends": [
+        "LUKE",
+        "HAN"
+      ],
+      "lastName": "Organa"
+    },
+    {
+      "id": "LUKE",
+      "type": "Human",
+      "firstName": "Luke",
+      "friendOf": "LEIA",
+      "friends": [
+        "LEIA",
+        "HAN",
+        "R2-D2"
+      ],
+      "lastName": "Skywalker"
+    },
+    {
+      "id": "R2-D2",
+      "type": "AstromechDroid",
+      "firstName": "R2-D2",
+      "friendOf": "LUKE"
+    }
+  ]
 }
 
 const exampleShapesGraph = {
   "@context": {
     "@base": "http://www.w3.org/ns/shacl#",
     "@vocab": "http://www.w3.org/ns/shacl#",
-    "news": "http://news.org/",
-    "schema": "http://schema.org/",
     "xsd": "http://www.w3.org/2001/XMLSchema#",
-    "rdf:type": {
-      "@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
-    },
-    "mz": "http://muzzle.network/",
+    "ex": "http://example.org/",
     "id": "@id",
     "type": "@type",
+    "targetNode": { "@type": "@id" },
     "targetClass": { "@type": "@id" },
     "targetSubjectsOf": { "@type": "@id" },
     "targetObjectsOf": { "@type": "@id" },
@@ -45,62 +77,12 @@ const exampleShapesGraph = {
     "predicate": { "@type": "@id" }
   },
   "@graph": [{
-    "id": "mz:insertBlankNode",
-    "type": "JSFunction",
-    "jsLibrary": {
-      "jsLibraryURL": "https://shacl-js-rule-test.firebaseapp.com/utilities.js"
-    },
-    "jsFunctionName": "insertBlankNode"
-  }, {
     "type": "NodeShape",
-    "targetSubjectsOf": "news:articles",
-    "property": [{
-      "path": "news:articles",
-      "order": 2,
-      "condition": {
-        "path": "rdf:type",
-        "hasValue": "schema:ItemList"
-      },
-      "values": " test!! should only appear on root!! "
-    }, {
-      "path": "rdf:type",
-      "values": {
-        "id": "schema:ItemList"
-      }
-    },
-    {
-      "path": "schema:itemListElement",
-      "values": {
-        "path": "news:articles"
-      },
-      "property": [{
-        "path": "rdf:type",
-        "order": 1,
-        "values": {
-          "id": "schema:Article"
-        }
-      }, {
-        "path": "news:title",
-        "order": 2,
-        "values": "mz:insertBlankNode"
-      }, {
-        "path": "news:author",
-        "order": 2,
-        "values": "mz:insertBlankNode"
-      }, {
-        "path": "schema:headline",
-        "order": 1,
-        "values": {
-          "path": "news:title"
-        }
-      }, {
-        "path": "schema:author",
-        "order": 1,
-        "values": {
-          "path": "news:author"
-        }
-      }]
-    }]
+    "targetSubjectsOf": "ex:firstName",
+    "property": {
+      "path": "ex:test",
+      "values": "test"
+    }
   }]
 }
 
