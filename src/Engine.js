@@ -422,8 +422,9 @@ class RuleComponent {
   }
 }
 
-class ValuesComponent {
+class ValuesComponent extends SHACL {
   constructor(values) {
+    super()
     this.values = values
   }
   async getOrder(_, focusNode) {
@@ -433,7 +434,8 @@ class ValuesComponent {
     if (order !== await this.getOrder(target, focusNode))  {
       return target
     }
-    target = target ? JSON.parse(JSON.stringify(target)) : target
+    target = this.values.nodes ? await this.getTargets(this.values.nodes) : (target ? JSON.parse(JSON.stringify(target)) : target)
+    console.log({ target })
     let path = focusNode.path.id === 'rdf:type' ? 'type' : focusNode.path.id
 
     // if (path === 'type' || path === '@type') {
@@ -451,6 +453,7 @@ class ValuesComponent {
     // console.log('values', JSON.parse(JSON.stringify({ values: this.values, target, focusNode })))
     // console.log(this.values, target, focusNode.path.id)
     // if (!target[focusNode.path.id]) {
+      
       ;(Array.isArray(this.values) ? this.values : [this.values]).map(v => {
         if (v.path) {
           if (target[v.path.id]) {

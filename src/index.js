@@ -80,12 +80,18 @@ const exampleShapesGraph = {
     "targetSubjectsOf": "ex:firstName",
     "property": {
       "path": "ex:friend",
+      "minCount": 1,
       "values": [{
+        "path": "ex:friendsWith"
+      }, {
         "path": "ex:friendsWith",
         "nodes": {
-          "targetSubjectsOf": "ex:friendWith",
+          "targetSubjectsOf": "ex:friendWith"
+        },
+        "filterShape": {
           "property": {
-            "path": "ex:friendWith"
+            "path": "ex:friendsWith",
+            "in": "this"
           }
         }
       }]
@@ -99,7 +105,7 @@ const exampleShapesGraph = {
   await engine.infer()
   await engine.validate()
   // console.log(engine.validationReport)
-  // console.log(engine.inferredGraph)
+  console.log(engine.inferredGraph)
   const inferredAndFramed = await jsonld.flatten(await jsonld.frame(engine.inferredGraph, {
     "@context": {
       "@base": "http://example.org/",
