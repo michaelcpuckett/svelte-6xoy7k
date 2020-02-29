@@ -24,7 +24,12 @@ const exampleDataGraph = {
         "LEIA",
         "LUKE"
       ],
-      "lastName": "Solo"
+      "lastName": "Solo",
+      "ship": {
+        "id": "MILLENIUM_FALCON",
+        "type": "CorellianFreighter",
+        "modelNumber": "YT 492727ZED"
+      }
     },
     {
       "id": "LEIA",
@@ -45,16 +50,19 @@ const exampleDataGraph = {
       "friendsWith": [
         "LEIA",
         "HAN",
-        "R2-D2"
+        {
+          "id": "R2-D2",
+          "type": "AstromechDroid"
+        }
       ],
       "lastName": "Skywalker"
     },
-    {
-      "id": "R2-D2",
-      "type": "AstromechDroid",
-      "firstName": "R2-D2",
-      "friendOf": "LUKE"
-    }
+    // {
+    //   "id": "R2-D2",
+    //   "type": "AstromechDroid",
+    //   "firstName": "R2-D2",
+    //   "friendOf": "LUKE"
+    // }
   ]
 }
 
@@ -98,7 +106,7 @@ const exampleShapesGraph = {
   await engine.validate()
   // console.log(engine.validationReport)
   // console.log(engine.inferredGraph)
-  const inferredAndFramed = await jsonld.frame(engine.inferredGraph, {
+  const inferredAndFramed = await jsonld.flatten(engine.inferredGraph, {
     "@context": {
       "@base": "http://example.org/",
       "@vocab": "http://example.org/",
@@ -108,12 +116,12 @@ const exampleShapesGraph = {
       "friendsWith": { "@type": "@id" },
       "friend": { "@type": "@id", "@container": "@set" }
     },
-    "@explicit": false,
     "friendOf": { "@type": "@null", "@default": null },
     "friendsWith": { "@type": "@null", "@default": null },
     "friend": { "@embed": false }
   }, {
-    "omitDefault": true,
+    "explicit": false,
+    // "omitDefault": true,
     "requireAll": false
   })
   console.log(inferredAndFramed)
