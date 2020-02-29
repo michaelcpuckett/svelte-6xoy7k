@@ -8,7 +8,7 @@ const exampleDataGraph = {
     "@vocab": "http://example.org/",
     "id": "@id",
     "type": "@type",
-    "friends": {
+    "friendsWith": {
       "@type": "@id"
     },
     "friendOf": {
@@ -31,7 +31,7 @@ const exampleDataGraph = {
       "type": "Human",
       "firstName": "Leia",
       "friendOf": "LUKE",
-      "friends": [
+      "friendsWith": [
         "LUKE",
         "HAN"
       ],
@@ -42,7 +42,7 @@ const exampleDataGraph = {
       "type": "Human",
       "firstName": "Luke",
       "friendOf": "LEIA",
-      "friends": [
+      "friendsWith": [
         "LEIA",
         "HAN",
         "R2-D2"
@@ -81,9 +81,9 @@ const exampleShapesGraph = {
     "type": "NodeShape",
     "targetSubjectsOf": "ex:firstName",
     "property": {
-      "path": "ex:allFriends",
+      "path": "ex:friend",
       "values": [{
-        "path": "ex:friends"
+        "path": "ex:friendsWith"
       }, {
         "path": "ex:friendOf"
       }]
@@ -105,13 +105,13 @@ const exampleShapesGraph = {
       "id": "@id",
       "type": "@type",
       "friendOf": { "@type": "@id" },
-      "friends": { "@type": "@id" },
-      "allFriends": { "@type": "@id", "@container": "@set" }
+      "friendsWith": { "@type": "@id" },
+      "friend": { "@type": "@id", "@container": "@set" }
     },
     "@explicit": false,
     "friendOf": { "@type": "@null", "@default": null },
-    "friends": { "@type": "@null", "@default": null },
-    "allFriends": { "@embed": false }
+    "friendsWith": { "@type": "@null", "@default": null },
+    "friend": { "@embed": false }
   }, {
     "omitDefault": true,
     "requireAll": false
