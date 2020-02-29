@@ -106,13 +106,15 @@ const exampleShapesGraph = {
       "type": "@type",
       "friendOf": { "@type": "@id" },
       "friends": { "@type": "@id" },
-      "allFriends": { "@type": "@id" }
+      "allFriends": { "@type": "@id", "@container": "@set" }
     },
+    "@explicit": false,
     "friendOf": { "@type": "@null", "@default": null },
     "friends": { "@type": "@null", "@default": null },
     "allFriends": { "@embed": false }
   }, {
-    "omitDefault": true
+    "omitDefault": true,
+    "requireAll": false
   })
   console.log(inferredAndFramed)
   // console.log(diff.addedDiff(engine.originalDataGraph, engine.inferredGraph))
