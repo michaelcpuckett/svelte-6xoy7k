@@ -20,10 +20,6 @@ const exampleDataGraph = {
       "id": "HAN",
       "type": "Human",
       "firstName": "Han",
-      "friendOf": [
-        "LEIA",
-        "LUKE"
-      ],
       "lastName": "Solo",
       "ship": {
         "id": "MILLENIUM_FALCON",
@@ -35,7 +31,6 @@ const exampleDataGraph = {
       "id": "LEIA",
       "type": "Human",
       "firstName": "Leia",
-      "friendOf": "LUKE",
       "friendsWith": [
         "LUKE",
         "HAN"
@@ -46,7 +41,6 @@ const exampleDataGraph = {
       "id": "LUKE",
       "type": "Human",
       "firstName": "Luke",
-      "friendOf": "LEIA",
       "friendsWith": [
         "LEIA",
         "HAN",
