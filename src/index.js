@@ -106,7 +106,7 @@ const exampleShapesGraph = {
   await engine.validate()
   // console.log(engine.validationReport)
   // console.log(engine.inferredGraph)
-  const inferredAndFramed = await jsonld.frame(engine.inferredGraph, {
+  const inferredAndFramed = await jsonld.flatten(await jsonld.frame(engine.inferredGraph, {
     "@context": {
       "@base": "http://example.org/",
       "@vocab": "http://example.org/",
@@ -124,6 +124,14 @@ const exampleShapesGraph = {
     "null": false,
     "omitDefault": true,
     "requireAll": false
+  }), {
+    "@context": {
+      "@base": "http://example.org/",
+      "@vocab": "http://example.org/",
+      "id": "@id",
+      "type": "@type",
+      "friend": { "@type": "@id", "@container": "@set" }
+    }
   })
   console.log(inferredAndFramed)
   // console.log(diff.addedDiff(engine.originalDataGraph, engine.inferredGraph))
