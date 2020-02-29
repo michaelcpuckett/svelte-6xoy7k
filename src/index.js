@@ -10,9 +10,6 @@ const exampleDataGraph = {
     "type": "@type",
     "friendsWith": {
       "@type": "@id"
-    },
-    "friendOf": {
-      "@type": "@id"
     }
   },
   "@graph": [
@@ -42,7 +39,6 @@ const exampleDataGraph = {
       "type": "Human",
       "firstName": "Luke",
       "friendsWith": [
-        "LEIA",
         "HAN",
         {
           "id": "R2-D2",
@@ -85,9 +81,13 @@ const exampleShapesGraph = {
     "property": {
       "path": "ex:friend",
       "values": [{
-        "path": "ex:friendsWith"
-      }, {
-        "path": "ex:friendOf"
+        "path": "ex:friendsWith",
+        "nodes": {
+          "targetSubjectsOf": "ex:friendWith",
+          "property": {
+            "path": "ex:friendWith"
+          }
+        }
       }]
     }
   }]
@@ -121,6 +121,7 @@ const exampleShapesGraph = {
       "id": "@id",
       "type": "@type",
       "friend": { "@type": "@id", "@container": "@set" },
+      "friendsWith": { "@type": "@id", "@container": "@set" },
       "ship": { "@type": "@id", "@container": "@set" }
     }
   })
