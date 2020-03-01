@@ -39,7 +39,7 @@ const exampleDataGraph = {
     {
       "id": "CHEWBACCA",
       "type": "Wookee",
-      "friendsWith": ["HAN"]
+      "friendsWith": ["HAN", "LEIA"]
     },
     {
       "id": "R2-D2",
