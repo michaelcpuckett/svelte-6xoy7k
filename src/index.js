@@ -11,12 +11,14 @@ const exampleDataGraph = {
     "friend": { "@type": "@id", "@container": "@set" },
     "marriedTo": { "@type": "@id", "@container": "@set" },
     "pilotedBy": { "@type": "@id", "@container": "@set" },
-    "pilots": { "@type": "@id", "@container": "@set" }
+    "pilots": { "@type": "@id", "@container": "@set" },
+    "affiliation": { "@type": "@id", "@container": "@set" }
   },
   "@graph": [
     {
       "id": "HAN",
       "type": "Human",
+      "affiliation": "REBEL_ALLIANCE",
       "firstName": "Han",
       "lastName": "Solo",
       "marriedTo": "LEIA",
@@ -29,6 +31,7 @@ const exampleDataGraph = {
     {
       "id": "LANDO",
       "type": "Human",
+      "affiliation": "REBEL_ALLIANCE",
       "firstName": "Lando",
       "lastName": "Calrissian",
       "friend": [
@@ -43,6 +46,7 @@ const exampleDataGraph = {
     {
       "id": "CHEWBACCA",
       "type": "Wookee",
+      "affiliation": "REBEL_ALLIANCE",
       "friend": ["HAN", "LEIA"],
       "pilots": {
         "id": "MILLENIUM_FALCON"
@@ -50,16 +54,19 @@ const exampleDataGraph = {
     },
     {
       "id": "R2-D2",
+      "affiliation": "REBEL_ALLIANCE",
       "type": "AstromechDroid"
     },
     {
       "id": "C-3PO",
+      "affiliation": "REBEL_ALLIANCE",
       "type": "ProtocolDroid",
       "friend": ["R2-D2", "LUKE", "LEIA"]
     },
     {
       "id": "LUKE",
       "type": "Human",
+      "affiliation": "REBEL_ALLIANCE",
       "firstName": "Luke",
       "friend": ["HAN", "R2-D2"],
       "lastName": "Skywalker"
@@ -67,6 +74,7 @@ const exampleDataGraph = {
     {
       "id": "LEIA",
       "type": "Human",
+      "affiliation": "REBEL_ALLIANCE",
       "firstName": "Leia",
       "friend": ["HAN", "LUKE"],
       "lastName": "Organa"
@@ -96,10 +104,8 @@ const exampleShapesGraph = {
   },
   "@graph": [{
     "type": "NodeShape",
-    "targetObjectsOf": "ex:member", // TODO
+    "targetSubjectsOf": "ex:affiliation", // TODO
     "property": [{
-
-    }, {
       "path": "ex:friend",
       "minCount": 1,
       "values": [{

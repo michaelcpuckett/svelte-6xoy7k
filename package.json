@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "dev": "webpack --watch"
+    "dev": "webpack --watch --mode development"
   },
   "dependencies": {
     "deep-object-diff": "^1.1.0",
