@@ -11,62 +11,6 @@ const exampleDataGraph = {
   },
   "@graph": [
     {
-      "id": "HEROES",
-      "member": [
-        {
-          "id": "MILLENIUM_FALCON",
-          "type": "CorellianFreighter",
-          "modelNumber": "YT 492727ZED"
-        },
-        {
-          "id": "HAN",
-          "type": "Human",
-          "firstName": "Han",
-          "lastName": "Solo",
-          "ship": {
-            "id": "MILLENIUM_FALCON"
-          }
-        },
-        {
-          "id": "R2-D2",
-          "type": "AstromechDroid"
-        },
-        {
-          "id": "LUKE",
-          "type": "Human",
-          "firstName": "Luke",
-          "friendsWith": [
-            {
-              "id": "HAN"
-            },
-            {
-              "id": "R2-D2"
-            }
-          ],
-          "lastName": "Skywalker"
-        },
-        {
-          "id": "LEIA",
-          "type": "Human",
-          "firstName": "Leia",
-          "friendsWith": [
-            {
-              "id": "HAN"
-            },
-            {
-              "id": "LUKE"
-            }
-          ],
-          "lastName": "Organa"
-        }
-      ]
-    },
-    {
-      "id": "MILLENIUM_FALCON",
-      "type": "CorellianFreighter",
-      "modelNumber": "YT 492727ZED"
-    },
-    {
       "id": "HAN",
       "type": "Human",
       "firstName": "Han",
@@ -82,24 +26,26 @@ const exampleDataGraph = {
       "type": "AstromechDroid"
     },
     {
+      "id": "C-3PO",
+      "type": "ProtocolDroid",
+      "friendsWith": [{
+        "id": "R2-D2"
+      }, {
+        "id": "LUKE"
+      }, {
+        "id": "LEIA"
+      }]
+    },
+    {
       "id": "LUKE",
       "type": "Human",
       "firstName": "Luke",
       "friendsWith": [
         {
-          "id": "HAN",
-          "type": "Human",
-          "firstName": "Han",
-          "lastName": "Solo",
-          "ship": {
-            "id": "MILLENIUM_FALCON",
-            "type": "CorellianFreighter",
-            "modelNumber": "YT 492727ZED"
-          }
+          "id": "HAN"
         },
         {
-          "id": "R2-D2",
-          "type": "AstromechDroid"
+          "id": "R2-D2"
         }
       ],
       "lastName": "Skywalker"
@@ -110,30 +56,10 @@ const exampleDataGraph = {
       "firstName": "Leia",
       "friendsWith": [
         {
-          "id": "HAN",
-          "type": "Human",
-          "firstName": "Han",
-          "lastName": "Solo",
-          "ship": {
-            "id": "MILLENIUM_FALCON",
-            "type": "CorellianFreighter",
-            "modelNumber": "YT 492727ZED"
-          }
+          "id": "HAN"
         },
         {
-          "id": "LUKE",
-          "type": "Human",
-          "firstName": "Luke",
-          "friendsWith": [
-            {
-              "id": "HAN"
-            },
-            {
-              "id": "R2-D2",
-              "type": "AstromechDroid"
-            }
-          ],
-          "lastName": "Skywalker"
+          "id": "LUKE"
         }
       ],
       "lastName": "Organa"
