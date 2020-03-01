@@ -10,8 +10,8 @@ const exampleDataGraph = {
     "type": "@type",
     "friend": { "@type": "@id", "@container": "@set" },
     "marriedTo": { "@type": "@id", "@container": "@set" },
-    "flownBy": { "@type": "@id", "@container": "@set" },
-    "fliesIn": { "@type": "@id", "@container": "@set" }
+    "pilotedBy": { "@type": "@id", "@container": "@set" },
+    "pilots": { "@type": "@id", "@container": "@set" }
   },
   "@graph": [
     {
@@ -20,7 +20,7 @@ const exampleDataGraph = {
       "firstName": "Han",
       "lastName": "Solo",
       "marriedTo": "LEIA",
-      "fliesIn": {
+      "pilots": {
         "id": "MILLENIUM_FALCON",
         "type": "CorellianFreighter",
         "modelNumber": "YT 492727ZED"
@@ -36,7 +36,7 @@ const exampleDataGraph = {
         "CHEWBACCA",
         "LEIA"
       ],
-      "fliesIn": {
+      "pilots": {
         "id": "MILLENIUM_FALCON"
       }
     },
@@ -44,7 +44,7 @@ const exampleDataGraph = {
       "id": "CHEWBACCA",
       "type": "Wookee",
       "friend": ["HAN", "LEIA"],
-      "fliesIn": {
+      "pilots": {
         "id": "MILLENIUM_FALCON"
       }
     },
@@ -118,11 +118,11 @@ const exampleShapesGraph = {
         }
       }]
     }, {
-      "path": "ex:flownBy",
+      "path": "ex:pilotedBy",
       "minCount": 1,
       "values": [{
         "path": {
-          "inversePath": "ex:fliesIn"
+          "inversePath": "ex:pilots"
         }
       }]
     }]
@@ -144,13 +144,13 @@ const exampleShapesGraph = {
   //     "type": "@type",
   //     "friend": { "@type": "@id", "@container": "@set" },
   //     "marriedTo": { "@type": "@id", "@container": "@set" },
-  //     "flownBy": { "@type": "@id", "@container": "@set" },
-  //     "fliesIn": { "@type": "@id", "@container": "@set" }
+  //     "pilotedBy": { "@type": "@id", "@container": "@set" },
+  //     "pilots": { "@type": "@id", "@container": "@set" }
   //   },
-  //   "fliesIn": {
+  //   "pilots": {
   //     "@embed": false
   //   },
-  //   "flownBy": {
+  //   "pilotedBy": {
   //     "@embed": false
   //   },
   //   "friend": {
