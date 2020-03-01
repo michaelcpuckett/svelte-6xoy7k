@@ -22,6 +22,14 @@ const exampleDataGraph = {
       "affiliation": {
         "id": "EMPIRE",
         "type": "Government"
+      },
+      "pilots": {
+        "id": "DARTH_VADERS_SHIP",
+        "type": "Ship",
+        "travelledTo": {
+          "id": "DEATH_STAR",
+          "type": "Location"
+        }
       }
     },
     {
