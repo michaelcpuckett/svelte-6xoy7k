@@ -12,7 +12,7 @@ const exampleDataGraph = {
     "marriedTo": { "@type": "@id", "@container": "@set" },
     "pilotedBy": { "@type": "@id", "@container": "@set" },
     "pilots": { "@type": "@id", "@container": "@set" },
-    "affiliation": { "@type": "@id", "@container": "@set" },
+    "affiliation": { "@type": "@id" },
     "travelledTo": { "@type": "@id" }
   },
   "@graph": [
@@ -42,6 +42,12 @@ const exampleDataGraph = {
       "travelledTo": [{
         "id": "CORUSCANT",
         "date": "-9-ABY"
+      }, {
+        "id": "BESPIN",
+        "date": "-3-ABY"
+      }, {
+        "id": "ENDOR",
+        "date": "6-ABY"
       }]
     },
     {
@@ -84,7 +90,7 @@ const exampleDataGraph = {
         "CHEWBACCA",
         "LEIA"
       ],
-      "pilots": ["MILLENIUM_FALCON", "LANDOS_SHIP"]
+      "pilots": ["LANDOS_SHIP"]
     },
     {
       "id": "CHEWBACCA",
@@ -212,7 +218,7 @@ const exampleShapesGraph = {
         "@type": "@id",
         "@container": "@set"
       },
-      "affiliation": { "@type": "@id", "@container": "@type" },
+      "affiliation": { "@type": "@id" },
       "beenTo": { "@type": "@id" }
     },
     "id": "LANDO",
