@@ -607,7 +607,7 @@ export class SHACLEngine extends SHACL {
     }, {
       "@context": finalContext
     }, {
-      embed: true,
+      embed: "@last",
       omitDefault: true
     })
 

@@ -8,8 +8,10 @@ const exampleDataGraph = {
     "@vocab": "http://example.org/",
     "id": "@id",
     "type": "@type",
-    "friend": { "@type": "@id" },
-    "marriedTo": { "@type": "@id" }
+    "friend": { "@type": "@id", "@container": "@set" },
+    "marriedTo": { "@type": "@id", "@container": "@set" },
+    "flownBy": { "@type": "@id", "@container": "@set" },
+    "fliesIn": { "@type": "@id", "@container": "@set" }
   },
   "@graph": [
     {
@@ -134,36 +136,36 @@ const exampleShapesGraph = {
   await engine.validate()
   // console.log(engine.validationReport)
   console.log(engine.inferredGraph)
-  const inferredAndFramed = await jsonld.flatten(engine.inferredGraph, {
-    "@context": {
-      "@base": "http://example.org/",
-      "@vocab": "http://example.org/",
-      "id": "@id",
-      "type": "@type",
-      "friend": { "@type": "@id", "@container": "@set" },
-      "marriedTo": { "@type": "@id", "@container": "@set" },
-      "flownBy": { "@type": "@id", "@container": "@set" },
-      "fliesIn": { "@type": "@id", "@container": "@set" }
-    },
-    "fliesIn": {
-      "@embed": false
-    },
-    "flownBy": {
-      "@embed": false
-    },
-    "friend": {
-      "@embed": false
-    },
-    "marriedTo": {
-      "@embed": false
-    }
-  }, {
-    "embed": true,
-    "explicit": false,//true,//true,//false,
-    // "null": true,
-    "omitDefault": true,
-    "requireAll": false//true
-  })
-  console.log(inferredAndFramed)
+  // const inferredAndFramed = await jsonld.flatten(engine.inferredGraph, {
+  //   "@context": {
+  //     "@base": "http://example.org/",
+  //     "@vocab": "http://example.org/",
+  //     "id": "@id",
+  //     "type": "@type",
+  //     "friend": { "@type": "@id", "@container": "@set" },
+  //     "marriedTo": { "@type": "@id", "@container": "@set" },
+  //     "flownBy": { "@type": "@id", "@container": "@set" },
+  //     "fliesIn": { "@type": "@id", "@container": "@set" }
+  //   },
+  //   "fliesIn": {
+  //     "@embed": false
+  //   },
+  //   "flownBy": {
+  //     "@embed": false
+  //   },
+  //   "friend": {
+  //     "@embed": false
+  //   },
+  //   "marriedTo": {
+  //     "@embed": false
+  //   }
+  // }, {
+  //   "embed": true,
+  //   "explicit": false,//true,//true,//false,
+  //   // "null": true,
+  //   "omitDefault": true,
+  //   "requireAll": false//true
+  // })
+  // console.log(inferredAndFramed)
   // console.log(diff.addedDiff(engine.originalDataGraph, engine.inferredGraph))
 })()
