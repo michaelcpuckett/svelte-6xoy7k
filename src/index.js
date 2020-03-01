@@ -12,9 +12,46 @@ const exampleDataGraph = {
     "marriedTo": { "@type": "@id", "@container": "@set" },
     "pilotedBy": { "@type": "@id", "@container": "@set" },
     "pilots": { "@type": "@id", "@container": "@set" },
-    "affiliation": { "@type": "@id", "@container": "@set" }
+    "affiliation": { "@type": "@id", "@container": "@set" },
+    "travelledTo": { "@type": "@id" }
   },
   "@graph": [
+    {
+      "id": "TATTOOINE",
+      "type": "Location"
+    }, {
+      "id": "HOTH",
+      "type": "Location"
+    }, {
+      "id": "BESPIN",
+      "type": "Location"
+    }, {
+      "id": "TATTOOINE",
+      "type": "Location"
+    }, {
+      "id": "ENDOR",
+      "type": "Location"
+    },
+    {
+      "id": "MILLENIUM_FALCON",
+      "type": "CorellianFreighter",
+      "modelNumber": "YT 492727ZED",
+      "travelledTo": [{
+        "id": "TATTOOINE",
+        "date": "0-ABY"
+      }, {
+        "id": "HOTH",
+        "date": "2-ABY"
+      }, {
+        "id": "BESPIN",
+        "date": "3-ABY"
+      }, {
+        "id": "TATTOOINE"
+      }, {
+        "id": "ENDOR",
+        "date": "6-ABY"
+      }]
+    },
     {
       "id": "HAN",
       "type": "Human",
@@ -22,11 +59,7 @@ const exampleDataGraph = {
       "firstName": "Han",
       "lastName": "Solo",
       "marriedTo": "LEIA",
-      "pilots": {
-        "id": "MILLENIUM_FALCON",
-        "type": "CorellianFreighter",
-        "modelNumber": "YT 492727ZED"
-      }
+      "pilots": "MILLENIUM_FALCON"
     },
     {
       "id": "LANDO",
@@ -39,18 +72,14 @@ const exampleDataGraph = {
         "CHEWBACCA",
         "LEIA"
       ],
-      "pilots": {
-        "id": "MILLENIUM_FALCON"
-      }
+      "pilots": ["MILLENIUM_FALCON"]
     },
     {
       "id": "CHEWBACCA",
       "type": "Wookee",
       "affiliation": "REBEL_ALLIANCE",
       "friend": ["HAN", "LEIA"],
-      "pilots": {
-        "id": "MILLENIUM_FALCON"
-      }
+      "pilots": ["MILLENIUM_FALCON"]
     },
     {
       "id": "R2-D2",
@@ -74,7 +103,7 @@ const exampleDataGraph = {
     {
       "id": "LEIA",
       "type": "Human",
-      "affiliation": "REBEL_ALLIANCE",
+      "affiliation": { "id": "REBEL_ALLIANCE", "type": "NGO" },
       "firstName": "Leia",
       "friend": ["HAN", "LUKE"],
       "lastName": "Organa"
@@ -104,8 +133,25 @@ const exampleShapesGraph = {
   },
   "@graph": [{
     "type": "NodeShape",
+    "targetNode": "ex:REBEL_ALLIANCE",
+    "property": {
+      "path": "ex:foo",
+      "values": "bar"
+    }
+  }, {
+    "type": "NodeShape",
     "targetSubjectsOf": "ex:affiliation", // TODO targetObjectsOf not implemented
     "property": [{
+      "path": "ex:travelledTo",
+      "values": {
+        "path": {
+          "@list": [
+            "ex:pilots",
+            "ex:travelledTo"
+          ]
+        }
+      }
+    }, {
       "path": "ex:friend",
       "minCount": 1,
       "values": [{
@@ -144,36 +190,32 @@ const exampleShapesGraph = {
   await engine.validate()
   // console.log(engine.validationReport)
   console.log(engine.inferredGraph)
-  // const inferredAndFramed = await jsonld.flatten(engine.inferredGraph, {
-  //   "@context": {
-  //     "@base": "http://example.org/",
-  //     "@vocab": "http://example.org/",
-  //     "id": "@id",
-  //     "type": "@type",
-  //     "friend": { "@type": "@id", "@container": "@set" },
-  //     "marriedTo": { "@type": "@id", "@container": "@set" },
-  //     "pilotedBy": { "@type": "@id", "@container": "@set" },
-  //     "pilots": { "@type": "@id", "@container": "@set" }
-  //   },
-  //   "pilots": {
-  //     "@embed": false
-  //   },
-  //   "pilotedBy": {
-  //     "@embed": false
-  //   },
-  //   "friend": {
-  //     "@embed": false
-  //   },
-  //   "marriedTo": {
-  //     "@embed": false
-  //   }
-  // }, {
-  //   "embed": true,
-  //   "explicit": false,//true,//true,//false,
-  //   // "null": true,
-  //   "omitDefault": true,
-  //   "requireAll": false//true
-  // })
-  // console.log(inferredAndFramed)
+  const inferredAndFramed = await jsonld.frame(engine.inferredGraph, {
+    "@context": {
+      "@base": "http://example.org/",
+      "@vocab": "http://example.org/",
+      "id": "@id",
+      "type": "@type",
+      "friend": { "@type": "@id", "@container": "@set" },
+      "marriedTo": { "@type": "@id", "@container": "@set" },
+      "pilots": {
+        "@type": "@id",
+        "@container": "@set"
+      },
+      "affiliation": { "@type": "@id", "@container": "@type" }
+    },
+    "id": "HAN",
+    "friend": { "@embed": false },
+    "marriedTo": { "@embed": false },
+    "pilots": { "@embed": false },
+    "travelledTo": { "@embed": true }
+  }, {
+    "embed": true,
+    "explicit": false,//true,//true,//false,
+    // "null": true,
+    "omitDefault": false,
+    "requireAll": false//true
+  })
+  console.log(inferredAndFramed)
   // console.log(diff.addedDiff(engine.originalDataGraph, engine.inferredGraph))
 })()

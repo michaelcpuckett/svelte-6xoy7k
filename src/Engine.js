@@ -441,7 +441,19 @@ class ValuesComponent extends SHACL {
 
     await Promise.all((Array.isArray(this.values) ? this.values : [this.values]).map(async v => {
       if (v.path) {
-        if (v.path.inversePath) {
+        if (v.path["@list"]) {
+          console.log(v.path["@list"])
+          const val = v.path["@list"].reduce((node, path) => {
+            console.log(node, path)
+            return node && node[path.id]
+          }, target)
+          console.log(val)
+          if (Array.isArray(target[path])) {
+            target[path] = [...target[path], val]
+          } else {
+            target[path] = val
+          }
+        } else if (v.path.inversePath) {
           const invertedData = ((await jsonld.frame({
             "@context": {
               ...graph["@context"],
