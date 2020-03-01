@@ -104,7 +104,7 @@ const exampleShapesGraph = {
   },
   "@graph": [{
     "type": "NodeShape",
-    "targetSubjectsOf": "ex:affiliation", // TODO
+    "targetSubjectsOf": "ex:affiliation", // TODO targetObjectsOf not implemented
     "property": [{
       "path": "ex:friend",
       "minCount": 1,
