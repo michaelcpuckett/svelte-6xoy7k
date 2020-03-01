@@ -570,6 +570,8 @@ export class SHACLEngine extends SHACL {
       }
     }))
 
+    // console.log(results)
+
     const inferredGraph = (await jsonld.flatten(results, {
       "@context": {
         "id": "@id",
