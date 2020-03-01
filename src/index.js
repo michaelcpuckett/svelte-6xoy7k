@@ -40,9 +40,6 @@ const exampleDataGraph = {
       "id": "LANDOS_SHIP",
       "type": "Ship",
       "travelledTo": [{
-        "id": "CORUSCANT",
-        "date": "-9-ABY"
-      }, {
         "id": "BESPIN",
         "date": "-3-ABY"
       }, {
