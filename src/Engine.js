@@ -566,10 +566,7 @@ export class SHACLEngine extends SHACL {
 
     this._inferredGraph = inferredGraph
 
-    const {
-      "@context": c,
-      "@graph": g
-    } = await jsonld.compact(await jsonld.frame(await jsonld.compact({
+    this.inferredGraph = await jsonld.frame({
       "@context": {
         "id": "@id",
         "type": "@type"
@@ -579,36 +576,6 @@ export class SHACLEngine extends SHACL {
       "@context": {
         ...this.originalDataGraph["@context"]
       }
-    }), {
-      "@context": {
-        ...this.originalDataGraph["@context"]
-      }
-    }, {
-      "@context": this.originalDataGraph["@context"]
-    }, {
-      embed: true
-    }), {
-      "@context": this.originalDataGraph["@context"]
-    })
-
-    const {
-      "@context": finalContext,
-      "@graph": dataGraph
-    } = {
-      "@context": c,
-      "@graph": g
-    }
-
-    this.inferredGraph = await jsonld.frame({
-      "@context": finalContext,
-      ...(dataGraph.length > 1 ? {
-        "@graph": dataGraph
-      } : dataGraph[0])
-    }, {
-      "@context": finalContext
-    }, {
-      embed: "@last",
-      omitDefault: true
     })
 
     return this.inferredGraph
