@@ -17,6 +17,11 @@ const exampleDataGraph = {
   },
   "@graph": [
     {
+      "id": "DARTH_VADER",
+      "type": "Human",
+      "affiliation": "EMPIRE"
+    },
+    {
       "id": "TATTOOINE",
       "type": "Location"
     }, {
