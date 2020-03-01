@@ -8,7 +8,8 @@ const exampleDataGraph = {
     "@vocab": "http://example.org/",
     "id": "@id",
     "type": "@type",
-    "friendsWith": { "@type": "@id" }
+    "friend": { "@type": "@id" },
+    "marriedTo": { "@type": "@id" }
   },
   "@graph": [
     {
@@ -16,6 +17,7 @@ const exampleDataGraph = {
       "type": "Human",
       "firstName": "Han",
       "lastName": "Solo",
+      "marriedTo": "LEIA",
       "ship": {
         "id": "MILLENIUM_FALCON",
         "type": "CorellianFreighter",
@@ -27,7 +29,7 @@ const exampleDataGraph = {
       "type": "Human",
       "firstName": "Lando",
       "lastName": "Calrissian",
-      "friendsWith": [
+      "friend": [
         "HAN",
         "CHEWBACCA",
         "LEIA"
@@ -39,7 +41,7 @@ const exampleDataGraph = {
     {
       "id": "CHEWBACCA",
       "type": "Wookee",
-      "friendsWith": ["HAN", "LEIA"]
+      "friend": ["HAN", "LEIA"]
     },
     {
       "id": "R2-D2",
@@ -48,20 +50,20 @@ const exampleDataGraph = {
     {
       "id": "C-3PO",
       "type": "ProtocolDroid",
-      "friendsWith": ["R2-D2", "LUKE", "LEIA"]
+      "friend": ["R2-D2", "LUKE", "LEIA"]
     },
     {
       "id": "LUKE",
       "type": "Human",
       "firstName": "Luke",
-      "friendsWith": ["HAN", "R2-D2"],
+      "friend": ["HAN", "R2-D2"],
       "lastName": "Skywalker"
     },
     {
       "id": "LEIA",
       "type": "Human",
       "firstName": "Leia",
-      "friendsWith": ["HAN", "LUKE"],
+      "friend": ["HAN", "LUKE"],
       "lastName": "Organa"
     }
   ]
@@ -90,17 +92,27 @@ const exampleShapesGraph = {
   "@graph": [{
     "type": "NodeShape",
     "targetObjectsOf": "ex:member",
-    "property": {
+    "property": [{
       "path": "ex:friend",
       "minCount": 1,
       "values": [{
-        "path": "ex:friendsWith"
+        "path": "ex:friend"
       }, {
         "path": {
-          "inversePath": "ex:friendsWith"
+          "inversePath": "ex:friend"
         }
       }]
-    }
+    }, {
+      "path": "ex:marriedTo",
+      "minCount": 1,
+      "values": [{
+        "path": "ex:marriedTo"
+      }, {
+        "path": {
+          "inversePath": "ex:marriedTo"
+        }
+      }]
+    }]
   }]
 }
 
@@ -117,14 +129,13 @@ const exampleShapesGraph = {
       "@vocab": "http://example.org/",
       "id": "@id",
       "type": "@type",
-      "friend": { "@type": "@id", "@container": "@set" }
-    },
-    "friendsWith": {
-      "@embed": false,
-      "@null": true,
-      "@container": null
+      "friend": { "@type": "@id", "@container": "@set" },
+      "marriedTo": { "@type": "@id", "@container": "@set" }
     },
     "friend": {
+      "@embed": false
+    },
+    "marriedTo": {
       "@embed": false
     }
   }, {
