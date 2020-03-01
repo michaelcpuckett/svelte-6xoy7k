@@ -27,7 +27,6 @@ class SHACL {
     }
   }
   async matchTargets(targets, $data) {
-    // console.log($data)
     if (targets.find(({ targetNode }) => targetNode)) {
       const targetNode = targets.find(({ targetNode }) => targetNode).targetNode.id
       return $data.filter(({ id }) => id === targetNode)
@@ -435,7 +434,6 @@ class ValuesComponent extends SHACL {
     if (order !== await this.getOrder(target, focusNode))  {
       return target
     }
-    console.log({ target })
     target = this.values.nodes ? await this.getTargets(this.values.nodes) : target
     target = target ? JSON.parse(JSON.stringify(target)) : target
 
@@ -444,7 +442,6 @@ class ValuesComponent extends SHACL {
     await Promise.all((Array.isArray(this.values) ? this.values : [this.values]).map(async v => {
       if (v.path) {
         if (v.path.inversePath) {
-          console.log(v.path.inversePath, target["@id"])
           const invertedData = ((await jsonld.frame({
             "@context": {
               ...graph["@context"],
@@ -507,8 +504,6 @@ export class SHACLEngine extends SHACL {
 
     this.originalDataContext = dataContext
     this.$data = data["@graph"] || [data]
-
-    console.log(this.$data)
 
     const {
       "@context": shapesContext,
@@ -674,7 +669,6 @@ export class SHACLEngine extends SHACL {
       const targets = await this.getTargets(node)
       const matchedTargets = await this.matchTargets(targets, graph["@graph"])
       const rulesByType = await this.getRulesByType(node)
-      // console.log({ matchedTargets })
       return await this.getInferenceResult(matchedTargets, rulesByType, node, graph, order)
     }))
   }

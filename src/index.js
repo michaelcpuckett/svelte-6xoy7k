@@ -7,7 +7,8 @@ const exampleDataGraph = {
     "@base": "http://example.org/",
     "@vocab": "http://example.org/",
     "id": "@id",
-    "type": "@type"
+    "type": "@type",
+    "friendsWith": { "@type": "@id" }
   },
   "@graph": [
     {
@@ -22,46 +23,45 @@ const exampleDataGraph = {
       }
     },
     {
+      "id": "LANDO",
+      "type": "Human",
+      "firstName": "Lando",
+      "lastName": "Calrissian",
+      "friendsWith": [
+        "HAN",
+        "CHEWBACCA",
+        "LEIA"
+      ],
+      "ship": {
+        "id": "MILLINEUM_FALCON"
+      }
+    },
+    {
+      "id": "CHEWBACCA",
+      "type": "Wookee",
+      "friendsWith": ["HAN"]
+    },
+    {
       "id": "R2-D2",
       "type": "AstromechDroid"
     },
     {
       "id": "C-3PO",
       "type": "ProtocolDroid",
-      "friendsWith": [{
-        "id": "R2-D2"
-      }, {
-        "id": "LUKE"
-      }, {
-        "id": "LEIA"
-      }]
+      "friendsWith": ["R2-D2", "LUKE", "LEIA"]
     },
     {
       "id": "LUKE",
       "type": "Human",
       "firstName": "Luke",
-      "friendsWith": [
-        {
-          "id": "HAN"
-        },
-        {
-          "id": "R2-D2"
-        }
-      ],
+      "friendsWith": ["HAN", "R2-D2"],
       "lastName": "Skywalker"
     },
     {
       "id": "LEIA",
       "type": "Human",
       "firstName": "Leia",
-      "friendsWith": [
-        {
-          "id": "HAN"
-        },
-        {
-          "id": "LUKE"
-        }
-      ],
+      "friendsWith": ["HAN", "LUKE"],
       "lastName": "Organa"
     }
   ]
