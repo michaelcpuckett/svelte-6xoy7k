@@ -434,44 +434,26 @@ class ValuesComponent extends SHACL {
     if (order !== await this.getOrder(target, focusNode))  {
       return target
     }
-    target = this.values.nodes ? await this.getTargets(this.values.nodes) : (target ? JSON.parse(JSON.stringify(target)) : target)
-    console.log({ target })
+    target = this.values.nodes ? await this.getTargets(this.values.nodes) : target
+    target = target ? JSON.parse(JSON.stringify(target)) : target
+
     let path = focusNode.path.id === 'rdf:type' ? 'type' : focusNode.path.id
 
-    // if (path === 'type' || path === '@type') {
-    //   // console.log(target, this.values.id)
-    //   target["@type"] = [ this.values.id ]
-    //   return target
-    // }
-    // if (typeof target === 'object' && target["@value"]) {
-    //   path = '@value'
-    // }
-    // console.log({ path, target, focusNode, values: this.values })
-    // if (target["@value"] && target.length === target.id ? 2 : 1) {
-    //   return target
-    // }
-    // console.log('values', JSON.parse(JSON.stringify({ values: this.values, target, focusNode })))
-    // console.log(this.values, target, focusNode.path.id)
-    // if (!target[focusNode.path.id]) {
-      
-      ;(Array.isArray(this.values) ? this.values : [this.values]).map(v => {
-        if (v.path) {
-          if (target[v.path.id]) {
-            if (Array.isArray(target[path])) {
-              target[path] = [...target[path], target[v.path.id]]
-            } else {
-              target[path] = target[v.path.id]
-            }
-          }
-        } else {
+    ;(Array.isArray(this.values) ? this.values : [this.values]).map(v => {
+      if (v.path.inversePath) {
+        console.log('!', v.path.inversePath.id)
+      }
+      if (v.path) {
+        if (target[v.path.id]) {
           if (Array.isArray(target[path])) {
-            target[path] = [...target[path], focusNode.path.id === 'rdf:type' ? v.id : v]
+            target[path] = [...target[path], target[v.path.id]]
           } else {
-            target[path] = focusNode.path.id === 'rdf:type' ? v.id : v
+            target[path] = target[v.path.id]
           }
         }
-      })
-    // }
+      }
+    })
+
     return target
   }
 }

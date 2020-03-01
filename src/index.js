@@ -154,6 +154,7 @@ const exampleShapesGraph = {
     "targetSubjectsOf": { "@type": "@id" },
     "targetObjectsOf": { "@type": "@id" },
     "path": { "@type": "@id" },
+    "inversePath": { "@type": "@id" },
     "class": { "@type": "@id" },
     "datatype": { "@type": "@id" },
     "nodeKind": { "@type": "@id" },
