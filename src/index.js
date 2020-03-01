@@ -8,6 +8,7 @@ const exampleDataGraph = {
     "@vocab": "http://example.org/",
     "id": "@id",
     "type": "@type",
+    "affiliation": { "@type": "@id" },
     "friend": { "@type": "@id", "@container": "@set" },
     "marriedTo": { "@type": "@id", "@container": "@set" },
     "pilotedBy": { "@type": "@id", "@container": "@set" },
@@ -239,17 +240,20 @@ const exampleShapesGraph = {
       "affiliation": { "@type": "@id" },
       "beenTo": { "@type": "@id" }
     },
-    "type": "Human",
-    "friend": { "@embed": false },
-    "marriedTo": { "@embed": false },
-    "pilots": { "@embed": false },
-    "beenTo": { "@embed": false }
+    "affiliation": { "@id": "EMPIRE" },
+    "@graph": {
+      "@requireAll": false,
+      "friend": { "@embed": false },
+      "marriedTo": { "@embed": false },
+      "pilots": { "@embed": false },
+      "beenTo": { "@embed": false }
+    }
   }, {
     "embed": true,
     "explicit": false,//true,//true,//false,
     // "null": true,
     "omitDefault": false,
-    "requireAll": false//true
+    "requireAll": true//true
   })
   console.log(inferredAndFramed)
   // console.log(diff.addedDiff(engine.originalDataGraph, engine.inferredGraph))
