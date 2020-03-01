@@ -144,11 +144,11 @@ class SHACL {
       console.log('NO COMPONENT FOUND')
     }
   }
-  async inferFromRule(type, rule, target, focusNode, order) {
+  async inferFromRule(type, rule, target, focusNode, graph, order) {
     const Component = await this.getRuleComponent(type, focusNode)
     if (Component) {
       const component = Component._values ? Component : new Component(rule)
-      return component.infer(target, focusNode, order)
+      return component.infer(target, focusNode, graph, order)
     } else {
       console.log('NO COMPONENT FOUND')
     }
@@ -176,13 +176,13 @@ class SHACL {
       }))))
     }))) : 0
   }
-  async getInferenceResult(matchedTargets, rulesByType, focusNode, order) {
+  async getInferenceResult(matchedTargets, rulesByType, focusNode, graph, order) {
     return (rulesByType && rulesByType.length) ? (await Promise.all(matchedTargets.map(async target => {
       return await Promise.all(rulesByType.map(async rulesOfType => await Promise.all(Object.entries(rulesOfType).map(async ([ type, rules ]) => {
         if (type === 'property') {
-          return await Promise.all((Array.isArray(rules) ? rules : [rules]).map(async rule => await this.inferFromRule(type, rule, target, (Array.isArray(focusNode.property) ? focusNode.property : [focusNode.property]).find(({ path }) => path.id === rule.path.id), order)))
+          return await Promise.all((Array.isArray(rules) ? rules : [rules]).map(async rule => await this.inferFromRule(type, rule, target, (Array.isArray(focusNode.property) ? focusNode.property : [focusNode.property]).find(({ path }) => path.id === rule.path.id), graph, order)))
         } else {
-          return await this.inferFromRule(type, rules, target, focusNode, order)
+          return await this.inferFromRule(type, rules, target, focusNode, graph, order)
         }
       }))))
     }))) : []
@@ -226,7 +226,7 @@ class PropertyConstraintComponent extends ConstraintComponent {
       throw new Error('NO PATH')
     }
   }
-  async infer(target, focusNode, order) {
+  async infer(target, focusNode, graph, order) {
     if (this.constraint.path) {
       const path = focusNode.path.id === 'rdf:type' ? 'type' : focusNode.path.id
       const nextTargets = [target, ...typeof target[path] === 'object' ? Array.isArray(target[path]) ? target[path] : [target[path]] : []]
@@ -241,7 +241,7 @@ class PropertyConstraintComponent extends ConstraintComponent {
         // console.log('...', [{ target, nextTargets, path, originalPath: focusNode.path.id, focusNode, order, constraint: this.constraint }])
       }
       const rulesByType = await this.getRulesByType(this.constraint)
-      return await this.getInferenceResult(nextTargets, rulesByType, focusNode, order)
+      return await this.getInferenceResult(nextTargets, rulesByType, focusNode, graph, order)
     } else {
       throw new Error('NO PATH')
     }
@@ -406,7 +406,7 @@ class RuleComponent {
   async getOrder(target) {
     return Math.max(target.order || 0, this.rule.order || 0)
   }
-  async infer(target, focusNode, order) {
+  async infer(target, focusNode, graph, order) {
     const subject = this.rule.subject.id === 'this' ? target : target[this.rule.subject.path.id]
     if (order !== await this.getOrder(target))  {
       return subject
@@ -430,7 +430,7 @@ class ValuesComponent extends SHACL {
   async getOrder(_, focusNode) {
     return focusNode.order || 0
   }
-  async infer(target, focusNode, order) {
+  async infer(target, focusNode, graph, order) {
     if (order !== await this.getOrder(target, focusNode))  {
       return target
     }
@@ -654,14 +654,14 @@ export class SHACLEngine extends SHACL {
       return await this.getInferenceOrder(matchedTargets, rulesByType, node)
     }))
   }
-  async getInferenceResults(order, data) {
+  async getInferenceResults(order, graph) {
     const nodesWithTargets = (await Promise.all(this.$shapes.map(async node => [await this.getTargets(node), node]))).map(([hasTargets, node]) => hasTargets ? node : null).filter(_ => _)
     return await Promise.all(nodesWithTargets.map(async node => {
       const targets = await this.getTargets(node)
-      const matchedTargets = await this.matchTargets(targets, data)
+      const matchedTargets = await this.matchTargets(targets, graph)
       const rulesByType = await this.getRulesByType(node)
       // console.log({ matchedTargets })
-      return await this.getInferenceResult(matchedTargets, rulesByType, node, order)
+      return await this.getInferenceResult(matchedTargets, rulesByType, node, graph, order)
     }))
   }
 }
