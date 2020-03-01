@@ -33,6 +33,18 @@ const exampleDataGraph = {
       "type": "Location"
     },
     {
+      "id": "CORUSCANT",
+      "type": "Location"
+    },
+    {
+      "id": "LANDOS_SHIP",
+      "type": "Ship",
+      "travelledTo": [{
+        "id": "CORUSCANT",
+        "date": "-9-ABY"
+      }]
+    },
+    {
       "id": "MILLENIUM_FALCON",
       "type": "CorellianFreighter",
       "modelNumber": "YT 492727ZED",
@@ -72,7 +84,7 @@ const exampleDataGraph = {
         "CHEWBACCA",
         "LEIA"
       ],
-      "pilots": ["MILLENIUM_FALCON"]
+      "pilots": ["MILLENIUM_FALCON", "LANDOS_SHIP"]
     },
     {
       "id": "CHEWBACCA",
@@ -200,13 +212,14 @@ const exampleShapesGraph = {
         "@type": "@id",
         "@container": "@set"
       },
-      "affiliation": { "@type": "@id", "@container": "@type" }
+      "affiliation": { "@type": "@id", "@container": "@type" },
+      "beenTo": { "@type": "@id" }
     },
-    "id": "HAN",
+    "id": "LANDO",
     "friend": { "@embed": false },
     "marriedTo": { "@embed": false },
     "pilots": { "@embed": false },
-    "beenTo": { "@embed": true }
+    "beenTo": { "@embed": false }
   }, {
     "embed": true,
     "explicit": false,//true,//true,//false,
