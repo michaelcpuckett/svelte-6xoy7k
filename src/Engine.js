@@ -41,8 +41,9 @@ class SHACL {
       return $data.filter(({ [targetSubjectsOf]: predicate }) => predicate || predicate === false)
     }
     if (targets.find(({ targetObjectsOf }) => targetObjectsOf)) {
-      const targetObjectsOf = targets.find(({ targetObjectsOf }) => targetObjectsOf).targetObjectsOf.id
-      return $data.filter(({ [targetObjectsOf]: predicate }) => predicate).map(({ [targetObjectsOf]: predicate }) => predicate).map(nodesWithPredicates => nodesWithPredicates.map(({ "@id": id }) => ({ "@id": id }))).flat(Infinity)
+      // const targetObjectsOf = targets.find(({ targetObjectsOf }) => targetObjectsOf).targetObjectsOf.id
+      // const retval = $data.filter(({ [targetObjectsOf]: predicate }) => predicate).map(({ [targetObjectsOf]: predicate }) => predicate).map(nodesWithPredicates => nodesWithPredicates.map(({ "@id": id }) => ({ "@id": id }))).flat(Infinity)
+      return $data
     }
   }
   async getTargets({
