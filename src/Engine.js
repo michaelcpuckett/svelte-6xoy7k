@@ -566,8 +566,6 @@ export class SHACLEngine extends SHACL {
 
     this._inferredGraph = inferredGraph
 
-
-
     this.inferredGraph = await jsonld.frame(
       {
         "@context": {
@@ -577,12 +575,14 @@ export class SHACLEngine extends SHACL {
         "@graph": inferredGraph
     }, {
       "@context": {
-        ...this.originalDataGraph["@context"],
-      }
+        ...this.originalDataGraph["@context"]
+      },
+      ...Object.fromEntries(this.originalDataGraph["@graph"].map(node => Object.keys(node)).flat(Infinity).filter(key => key !== 'id' && key !== 'type').map(key => ([key, { "@embed": false }])))
     }, {
       "@embed": true,
       embed: true,
       requireAll: false,
+      omitDefault: true,
       "@requireAll": false
     })
 
