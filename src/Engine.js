@@ -457,19 +457,17 @@ class ValuesComponent extends SHACL {
         } else if (v.path.inversePath) {
           const invertedData = ((await jsonld.frame({
             "@context": {
-              ...graph["@context"],
               "id": "@id",
               "type": "@type"
             },
             "@graph": graph
           }, {
             "@context": {
-              ...graph["@context"],
               "id": "@id",
               "type": "@type",
               "__SHACL_inversePath_result": { "@reverse": v.path.inversePath.id, "@container": "@set" }
             },
-            "id": target["@id"],
+            "id": target["id"],
             "__SHACL_inversePath_result": { }
           }, {
             explicit: true,
@@ -539,12 +537,12 @@ export class SHACLEngine extends SHACL {
     const ruleOrders = [0,1,2]// [...new Set((await this.getInferenceOrderList()).flat(Infinity))]
     const results = await ruleOrders.reduce(async (promise, order) => {
       const p = await promise
-      const prev = JSON.parse(JSON.stringify([...new Set(p.map(node => JSON.stringify(node)))].map(node => JSON.parse(node))))
+      const prev = JSON.parse(JSON.stringify([...new Set(p["@graph"].map(node => JSON.stringify(node)))].map(node => JSON.parse(node))))
       const thisResult = await this.getInferenceResults(order, {
         "@context": this.originalDataContext,
         "@graph": prev
       })
-      const inferredGraph = await jsonld.expand({
+      const inferredGraph = await jsonld.frame({
         "@context": {
           "id": "@id",
           "type": "@type"
@@ -557,7 +555,7 @@ export class SHACLEngine extends SHACL {
         }
       })
       return inferredGraph
-    }, await jsonld.expand({
+    }, await jsonld.frame({
       "@context": {
         "id": "@id",
         "type": "@type"
