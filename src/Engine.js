@@ -498,6 +498,8 @@ export class SHACLEngine extends SHACL {
         "id": "@id",
         "type": "@type"
       }
+    }, {
+      embed: true
     })
 
     this.originalDataContext = dataContext
