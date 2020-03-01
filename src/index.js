@@ -235,10 +235,7 @@ const exampleShapesGraph = {
       "type": "@type",
       "friend": { "@type": "@id" },
       "marriedTo": { "@type": "@id" },
-      "pilots": {
-        "@type": "@id",
-        "@container": "@set"
-      },
+      "pilots": { "@type": "@id" },
       "affiliation": { "@type": "@id" },
       "beenTo": { "@type": "@id" }
     },
