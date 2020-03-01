@@ -225,8 +225,8 @@ const exampleShapesGraph = {
       "@vocab": "http://example.org/",
       "id": "@id",
       "type": "@type",
-      "friend": { "@type": "@id", "@container": "@set" },
-      "marriedTo": { "@type": "@id", "@container": "@set" },
+      "friend": { "@type": "@id" },
+      "marriedTo": { "@type": "@id" },
       "pilots": {
         "@type": "@id",
         "@container": "@set"
