@@ -218,7 +218,7 @@ const exampleShapesGraph = {
       "affiliation": { "@type": "@id" },
       "beenTo": { "@type": "@id" }
     },
-    "type": "Human",
+    "affiliation": "REBEL_ALLIANCE",
     "friend": { "@embed": false },
     "marriedTo": { "@embed": false },
     "pilots": { "@embed": false },
