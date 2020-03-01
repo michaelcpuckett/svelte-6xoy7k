@@ -566,16 +566,24 @@ export class SHACLEngine extends SHACL {
 
     this._inferredGraph = inferredGraph
 
-    this.inferredGraph = await jsonld.frame({
-      "@context": {
-        "id": "@id",
-        "type": "@type"
-      },
-      "@graph": inferredGraph
+
+
+    this.inferredGraph = await jsonld.frame(
+      {
+        "@context": {
+          "id": "@id",
+          "type": "@type"
+        },
+        "@graph": inferredGraph
     }, {
       "@context": {
-        ...this.originalDataGraph["@context"]
+        ...this.originalDataGraph["@context"],
       }
+    }, {
+      "@embed": true,
+      embed: true,
+      requireAll: false,
+      "@requireAll": false
     })
 
     return this.inferredGraph
