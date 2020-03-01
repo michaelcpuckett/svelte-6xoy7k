@@ -442,11 +442,13 @@ class ValuesComponent extends SHACL {
     await Promise.all((Array.isArray(this.values) ? this.values : [this.values]).map(async v => {
       if (v.path) {
         if (Array.isArray(v.path) || v.path["@list"]) {
-          const fullPath = (v.path["@list"] || v.path).map(node => node.id)
-          console.log(fullPath)
+          const fullPath = [...(v.path["@list"] || v.path).map(node => node.id)].reverse()
+          console.log({ fullPath })
           const val = fullPath.reduce((currentNode, p) => {
-            return currentNode ? currentNode[p] : null
+            console.log( p, currentNode ? currentNode[p] : null)
+            return currentNode ? Array.isArray(currentNode) ? currentNode.filter(node => node[p]).map(node => node[p]) : currentNode[p] : null
           }, target)
+          console.log({ val })
           if (Array.isArray(target[path])) {
             target[path] = [...target[path], val]
           } else {

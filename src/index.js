@@ -144,12 +144,10 @@ const exampleShapesGraph = {
     "property": [{
       "path": "ex:beenTo",
       "values": {
-        "path": {
-          "@list": [
-            "ex:pilots",
-            "ex:travelledTo"
-          ]
-        }
+        "path": [
+          "ex:pilots",
+          "ex:travelledTo"
+        ]
       }
     }, {
       "path": "ex:friend",
