@@ -19,7 +19,10 @@ const exampleDataGraph = {
     {
       "id": "DARTH_VADER",
       "type": "Human",
-      "affiliation": "EMPIRE"
+      "affiliation": {
+        "id": "EMPIRE",
+        "type": "Government"
+      }
     },
     {
       "id": "TATTOOINE",
@@ -223,7 +226,7 @@ const exampleShapesGraph = {
       "affiliation": { "@type": "@id" },
       "beenTo": { "@type": "@id" }
     },
-    "affiliation": "REBEL_ALLIANCE",
+    "type": "Human",
     "friend": { "@embed": false },
     "marriedTo": { "@embed": false },
     "pilots": { "@embed": false },
