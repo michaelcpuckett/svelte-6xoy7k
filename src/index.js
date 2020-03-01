@@ -193,18 +193,14 @@ const exampleShapesGraph = {
       "type": "@type",
       "friend": { "@type": "@id", "@container": "@set" }
     },
-    // "member": {
-      // "@explicit": false,
-      // "@embed": true,
-      "friendsWith": {
-        "@embed": false,
-        "@null": true,
-        "@container": null
-      },
-      "friend": {
-        "@embed": false
-      }
-    // }
+    "friendsWith": {
+      "@embed": false,
+      "@null": true,
+      "@container": null
+    },
+    "friend": {
+      "@embed": false
+    }
   }, {
     "embed": true,
     "explicit": false,//true,//true,//false,
