@@ -71,13 +71,21 @@ const exampleDataGraph = {
         "id": "TATTOOINE",
         "date": "0-ABY"
       }, {
+        "id": "DEATH_STAR",
+        "date": "0-ABY"
+      }, {
+        "id": "YAVIN",
+        "type": "Location",
+        "date": "0-ABY"
+      }, {
         "id": "HOTH",
         "date": "2-ABY"
       }, {
         "id": "BESPIN",
         "date": "3-ABY"
       }, {
-        "id": "TATTOOINE"
+        "id": "TATTOOINE",
+        "date": "6-ABY"
       }, {
         "id": "ENDOR",
         "date": "6-ABY"
