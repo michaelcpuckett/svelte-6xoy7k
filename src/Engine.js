@@ -434,6 +434,7 @@ class ValuesComponent extends SHACL {
     if (order !== await this.getOrder(target, focusNode))  {
       return target
     }
+    console.log({ target })
     target = this.values.nodes ? await this.getTargets(this.values.nodes) : target
     target = target ? JSON.parse(JSON.stringify(target)) : target
 

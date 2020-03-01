@@ -163,7 +163,7 @@ const exampleShapesGraph = {
   },
   "@graph": [{
     "type": "NodeShape",
-    "targetSubjectsOf": "ex:firstName",
+    "targetObjectsOf": "ex:member",
     "property": {
       "path": "ex:friend",
       "minCount": 1,
