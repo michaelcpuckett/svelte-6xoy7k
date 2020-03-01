@@ -18,7 +18,7 @@ const exampleDataGraph = {
       "firstName": "Han",
       "lastName": "Solo",
       "marriedTo": "LEIA",
-      "ship": {
+      "fliesIn": {
         "id": "MILLENIUM_FALCON",
         "type": "CorellianFreighter",
         "modelNumber": "YT 492727ZED"
@@ -34,14 +34,17 @@ const exampleDataGraph = {
         "CHEWBACCA",
         "LEIA"
       ],
-      "ship": {
-        "id": "MILLINEUM_FALCON"
+      "fliesIn": {
+        "id": "MILLENIUM_FALCON"
       }
     },
     {
       "id": "CHEWBACCA",
       "type": "Wookee",
-      "friend": ["HAN", "LEIA"]
+      "friend": ["HAN", "LEIA"],
+      "fliesIn": {
+        "id": "MILLENIUM_FALCON"
+      }
     },
     {
       "id": "R2-D2",
@@ -112,6 +115,14 @@ const exampleShapesGraph = {
           "inversePath": "ex:marriedTo"
         }
       }]
+    }, {
+      "path": "ex:flownBy",
+      "minCount": 1,
+      "values": [{
+        "path": {
+          "inversePath": "ex:fliesIn"
+        }
+      }]
     }]
   }]
 }
@@ -123,14 +134,22 @@ const exampleShapesGraph = {
   await engine.validate()
   // console.log(engine.validationReport)
   console.log(engine.inferredGraph)
-  const inferredAndFramed = await jsonld.frame(engine.inferredGraph, {
+  const inferredAndFramed = await jsonld.flatten(engine.inferredGraph, {
     "@context": {
       "@base": "http://example.org/",
       "@vocab": "http://example.org/",
       "id": "@id",
       "type": "@type",
       "friend": { "@type": "@id", "@container": "@set" },
-      "marriedTo": { "@type": "@id", "@container": "@set" }
+      "marriedTo": { "@type": "@id", "@container": "@set" },
+      "flownBy": { "@type": "@id", "@container": "@set" },
+      "fliesIn": { "@type": "@id", "@container": "@set" }
+    },
+    "fliesIn": {
+      "@embed": false
+    },
+    "flownBy": {
+      "@embed": false
     },
     "friend": {
       "@embed": false
