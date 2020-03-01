@@ -185,30 +185,32 @@ const exampleShapesGraph = {
   await engine.validate()
   // console.log(engine.validationReport)
   console.log(engine.inferredGraph)
-  const inferredAndFramed = await jsonld.flatten(await jsonld.frame(engine.inferredGraph, {
+  const inferredAndFramed = await jsonld.frame(engine.inferredGraph, {
     "@context": {
       "@base": "http://example.org/",
       "@vocab": "http://example.org/",
       "id": "@id",
       "type": "@type",
-      "friend": { "@type": "@id", "@container": "@set" },
-      "ship": { "@type": "@id", "@container": "@set" }
-    }
+      "friend": { "@type": "@id", "@container": "@set" }
+    },
+    // "member": {
+      // "@explicit": false,
+      // "@embed": true,
+      "friendsWith": {
+        "@embed": false,
+        "@null": true,
+        "@container": null
+      },
+      "friend": {
+        "@embed": false
+      }
+    // }
   }, {
-    "explicit": false,
-    "null": false,
+    "embed": true,
+    "explicit": false,//true,//true,//false,
+    // "null": true,
     "omitDefault": true,
-    "requireAll": false
-  }), {
-    "@context": {
-      "@base": "http://example.org/",
-      "@vocab": "http://example.org/",
-      "id": "@id",
-      "type": "@type",
-      "friend": { "@type": "@id", "@container": "@set" },
-      "friendsWith": { "@type": "@id", "@container": "@set" },
-      "ship": { "@type": "@id", "@container": "@set" }
-    }
+    "requireAll": false//true
   })
   console.log(inferredAndFramed)
   // console.log(diff.addedDiff(engine.originalDataGraph, engine.inferredGraph))
