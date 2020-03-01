@@ -96,8 +96,10 @@ const exampleShapesGraph = {
   },
   "@graph": [{
     "type": "NodeShape",
-    "targetObjectsOf": "ex:member",
+    "targetObjectsOf": "ex:member", // TODO
     "property": [{
+
+    }, {
       "path": "ex:friend",
       "minCount": 1,
       "values": [{
