@@ -439,9 +439,11 @@ class ValuesComponent extends SHACL {
 
     let path = focusNode.path.id === 'rdf:type' ? 'type' : focusNode.path.id
 
-    ;(Array.isArray(this.values) ? this.values : [this.values]).map(v => {
+    await Promise.all((Array.isArray(this.values) ? this.values : [this.values]).map(async v => {
       if (v.path.inversePath) {
-        console.log('!', v.path.inversePath.id)
+        console.log('!', v.path.inversePath.id, { target }, await jsonld.frame(graph, {
+
+        }))
       }
       if (v.path) {
         if (target[v.path.id]) {
@@ -452,7 +454,7 @@ class ValuesComponent extends SHACL {
           }
         }
       }
-    })
+    }))
 
     return target
   }
