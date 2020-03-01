@@ -40,10 +40,10 @@ class SHACL {
       const targetSubjectsOf = targets.find(({ targetSubjectsOf }) => targetSubjectsOf).targetSubjectsOf.id
       return $data.filter(({ [targetSubjectsOf]: predicate }) => predicate || predicate === false)
     }
-    // if (targets.find(({ targetObjectsOf }) => targetObjectsOf)) {
-    //   const targetObjectsOf = targets.find(({ targetObjectsOf }) => targetObjectsOf).targetObjectsOf.id
-    //   return $data.filter(({ type }) => type === targetObjectsOf)
-    // }
+    if (targets.find(({ targetObjectsOf }) => targetObjectsOf)) {
+      const targetObjectsOf = targets.find(({ targetObjectsOf }) => targetObjectsOf).targetObjectsOf.id
+      return $data.filter(({ [targetObjectsOf]: predicate }) => predicate).map(({ [targetObjectsOf]: predicate }) => predicate).map(nodesWithPredicates => nodesWithPredicates.map(({ "@id": id }) => ({ "@id": id }))).flat(Infinity)
+    }
   }
   async getTargets({
     targetNode,
@@ -443,6 +443,7 @@ class ValuesComponent extends SHACL {
     await Promise.all((Array.isArray(this.values) ? this.values : [this.values]).map(async v => {
       if (v.path) {
         if (v.path.inversePath) {
+          console.log(v.path.inversePath, target["@id"])
           const invertedData = ((await jsonld.frame({
             "@context": {
               ...graph["@context"],
@@ -463,7 +464,6 @@ class ValuesComponent extends SHACL {
             explicit: true,
             omitGraph: true
           }))["@graph"][0]["__SHACL_inversePath_result"] || [])
-          console.log(invertedData)
           if (invertedData) {
             if (Array.isArray(target[path])) {
               target[path] = [...target[path], invertedData]
