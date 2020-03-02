@@ -185,20 +185,20 @@ const exampleShapesGraph = {
       "path": "ex:copilot",
       "order": 2,
       "values": {
-        "nodes": {
+        // "nodes": {
           "path": [
             "ex:pilots",
             {
               "inversePath": "ex:pilots"
             }
           ]
-        },
-        "filterShape": {
-          "not": {
-            "path": "id",
-            "hasValue": "this"
-          }
-        }
+        // },
+        // "filterShape": {
+          // "not": {
+            // "path": "id",
+            // "minCount": 1
+          // }
+        // }
       }
     }, /*{
       "path": "ex:friend",

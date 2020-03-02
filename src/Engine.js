@@ -434,12 +434,17 @@ class ValuesComponent extends SHACL {
     if (order !== await this.getOrder(target, focusNode))  {
       return target
     }
+    const originalTarget = target
     target = this.values.nodes ? await this.getTargets(this.values.nodes) : target
     target = target ? JSON.parse(JSON.stringify(target)) : target
 
     let path = focusNode.path.id === 'rdf:type' ? 'type' : focusNode.path.id
 
     await Promise.all((Array.isArray(this.values) ? this.values : [this.values]).map(async v => {
+      if (v.filterShape) {
+        console.log('filterShape', v.filterShape, v.nodes, { originalTarget })
+        return target
+      }
       if (v.path) {
         if (Array.isArray(v.path) || v.path["@list"]) {
           const fullPath = (v.path["@list"] || v.path).map(node => node)
@@ -507,24 +512,6 @@ class ValuesComponent extends SHACL {
             explicit: true,
             omitGraph: true
           }))
-          /*console.log(v.path.inversePath.id, graph, await jsonld.frame({
-            "@context": {
-              "id": "@id",
-              "type": "@type"
-            },
-            "@graph": graph
-          }, {
-            "@context": {
-              "id": "@id",
-              "type": "@type",
-              "__SHACL_inversePath_result": { "@reverse": v.path.inversePath.id, "@container": "@set" }
-            },
-            "id": target["id"],
-            "__SHACL_inversePath_result": { }
-          }, {
-            explicit: true,
-            omitGraph: true
-          }))*/
           if (invertedData) {
             if (Array.isArray(target[path])) {
               target[path] = [...target[path], invertedData]
@@ -532,13 +519,14 @@ class ValuesComponent extends SHACL {
               target[path] = invertedData
             }
           }
-        } else if (target[v.path.id]) {
-          if (Array.isArray(target[path])) {
-            target[path] = [...target[path], target[v.path.id]]
-          } else {
-            target[path] = target[v.path.id]
-          }
-        }
+        } 
+        // else if (target[v.path.id]) {
+        //   if (Array.isArray(target[path])) {
+        //     target[path] = [...target[path], target[v.path.id]]
+        //   } else {
+        //     target[path] = target[v.path.id]
+        //   }
+        // }
       }
     }))
 
