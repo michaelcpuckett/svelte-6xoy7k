@@ -240,7 +240,7 @@ const exampleShapesGraph = {
       "affiliation": { "@type": "@id" },
       "beenTo": { "@type": "@id" }
     },
-    "affiliation": { "@id": "EMPIRE" },
+    "affiliation": { "@id": "REBEL_ALLIANCE" },
     "@graph": {
       "@requireAll": false,
       "friend": { "@embed": false },
@@ -256,37 +256,5 @@ const exampleShapesGraph = {
     "requireAll": true//true
   })
   console.log(inferredAndFramed)
-  console.log(await jsonld.frame({
-    "@context": {
-      "@base": "http://starwars.com/",
-      "@vocab": "http://starwars.com/",
-      "id": "@id",
-      "type": "@type",
-      "affiliation": {
-        "@type": "@id"
-      }
-    },
-    "@graph": [
-      {
-        "id": "DARTH_VADER",
-        "type": "Human",
-        "affiliation": "EMPIRE"
-      },
-      {
-        "id": "HAN",
-        "type": "Human",
-        "affiliation": "REBEL_ALLIANCE"
-      }
-    ]
-  }, {
-    "@context": {
-      "@base": "http://starwars.com/",
-      "@vocab": "http://starwars.com/",
-      "id": "@id",
-      "type": "@type",
-      "affiliation": { "@type": "@id" }
-    },
-    "affiliation": { "@id": "EMPIRE" }
-  }))
   // console.log(diff.addedDiff(engine.originalDataGraph, engine.inferredGraph))
 })()
