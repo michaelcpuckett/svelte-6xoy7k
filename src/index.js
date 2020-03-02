@@ -196,7 +196,13 @@ const exampleShapesGraph = {
       "path": "ex:copilotCopy",
       "order": 2,
       "values": [{
-        "path": "ex:copilot"
+        "path": [
+          "ex:copilot",
+          "ex:friend",
+          {
+            "inversePath": "ex:friend"
+          }
+        ]
       }]
     }, {
       "path": "ex:copilot",
@@ -217,7 +223,7 @@ const exampleShapesGraph = {
           // }
         // }
       }
-    }/*, {
+    }, {
       "path": "ex:friend",
       "minCount": 1,
       "values": [{
@@ -237,7 +243,7 @@ const exampleShapesGraph = {
           "inversePath": "ex:marriedTo"
         }
       }]
-    }*/]
+    }]
   }]
 }
 
@@ -262,7 +268,7 @@ const exampleShapesGraph = {
       "copilot": { "@type": "@id" },
       "friendOfPartner": { "@type": "@id" }
     },
-    "id": "HAN"
+    "id": "CHEWBACCA"
   }, {
     "embed": false,
     "explicit": false,//true,//true,//false,

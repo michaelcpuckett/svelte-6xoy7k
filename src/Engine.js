@@ -455,6 +455,8 @@ class ValuesComponent extends SHACL {
               if (!currentNode) {
                 return null
               }
+
+              console.log(currentNode, (Array.isArray(currentNode) ? currentNode.flat() : [currentNode]).map(({ id }) => id))
               
               const {
                 "@context": c,
@@ -472,7 +474,7 @@ class ValuesComponent extends SHACL {
                   "type": "@type",
                   "__SHACL_inversePath_result": { "@reverse": p.inversePath.id, "@container": "@set" }
                 },
-                "id": (Array.isArray(currentNode) ? currentNode : [currentNode]).map(({ id }) => id),
+                "id": (Array.isArray(currentNode) ? currentNode.flat() : [currentNode]).map(({ id }) => id),
                 "__SHACL_inversePath_result": { }
               }, {
                 explicit: true,
