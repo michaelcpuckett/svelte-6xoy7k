@@ -577,7 +577,7 @@ export class SHACLEngine extends SHACL {
     const ruleOrders = [0,1,2]// [...new Set((await this.getInferenceOrderList()).flat(Infinity))]
     const results = await ruleOrders.reduce(async (promise, order) => {
       const p = await promise
-      const prev = JSON.parse(JSON.stringify([...new Set(p["@graph"].map(node => JSON.stringify(node)))].map(node => JSON.parse(node))))
+      const prev = [...new Set(p["@graph"])]
       const thisResult = await this.getInferenceResults(order, {
         "@context": this.originalDataContext,
         "@graph": prev
