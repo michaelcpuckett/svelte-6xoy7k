@@ -482,6 +482,8 @@ class ValuesComponent extends SHACL {
             }
             return currentNode ? Array.isArray(currentNode) ? currentNode.filter(node => node[p.id]).map(node => node[p.id]) : currentNode[p.id] : null
           }, target)
+
+
           if (Array.isArray(target[path])) {
             target[path] = [...target[path], val]
           } else {
