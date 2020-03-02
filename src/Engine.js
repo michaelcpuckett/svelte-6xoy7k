@@ -457,7 +457,7 @@ class ValuesComponent extends SHACL {
         } else if (v.path.inversePath) {
           const {
             "@context": c,
-            ...invertedData
+            "__SHACL_inversePath_result": invertedData
           } = (await jsonld.frame({
             "@context": {
               "id": "@id",
