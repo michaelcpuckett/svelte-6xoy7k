@@ -129,7 +129,7 @@ const exampleDataGraph = {
       "type": "Wookee",
       "affiliation": "REBEL_ALLIANCE",
       "friend": ["HAN", "LEIA"],
-      "pilots": ["MILLENIUM_FALCON"]
+      "pilots": "MILLENIUM_FALCON"
     },
     {
       "id": "R2-D2",
@@ -264,7 +264,7 @@ const exampleShapesGraph = {
       "copilot": { "@type": "@id" },
       "friendOfPartner": { "@type": "@id" }
     },
-    "id": "HAN"
+    "id": ["CHEWBACCA", "HAN"]
   }, {
     "embed": false,
     "explicit": false,//true,//true,//false,
