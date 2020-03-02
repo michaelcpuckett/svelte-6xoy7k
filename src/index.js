@@ -242,7 +242,7 @@ const exampleShapesGraph = {
     },
     "affiliation": { "@id": "REBEL_ALLIANCE" },
     "@graph": {
-      "@requireAll": false,
+      "@requireAll": true,
       "friend": { "@embed": false },
       "marriedTo": { "@embed": false },
       "pilots": { "@embed": false },
