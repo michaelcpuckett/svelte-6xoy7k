@@ -510,18 +510,18 @@ class ValuesComponent extends SHACL {
             omitGraph: true
           }))
           if (invertedData) {
-            if (Array.isArray(target[path])) {
-              target[path] = [...target[path], invertedData]
+            if (Array.isArray(target[v.path.id])) {
+              target[v.path.id] = [...target[v.path.id], invertedData]
             } else {
-              target[path] = invertedData
+              target[v.path.id] = invertedData
             }
           }
         } 
         else if (target[v.path.id]) {
-          if (Array.isArray(target[path])) {
-            target[path] = [...target[path], target[v.path.id]]
+          if (Array.isArray(target[v.path.id])) {
+            target[v.path.id] = [...target[v.path.id], target[v.path.id]]
           } else {
-            target[path] = target[v.path.id]
+            target[v.path.id] = target[v.path.id]
           }
         } else {
           console.log({ target, path })
