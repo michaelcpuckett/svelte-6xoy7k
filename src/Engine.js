@@ -456,8 +456,6 @@ class ValuesComponent extends SHACL {
                 return null
               }
 
-              console.log(currentNode, (Array.isArray(currentNode) ? currentNode.flat() : [currentNode]).map(({ id }) => id))
-              
               const {
                 "@context": c,
                 "@graph": g,

@@ -193,7 +193,7 @@ const exampleShapesGraph = {
     "type": "NodeShape",
     "targetSubjectsOf": "ex:affiliation", // TODO targetObjectsOf not implemented
     "property": [{
-      "path": "ex:copilotCopy",
+      "path": "ex:beenTo",
       "values": [{
         "path": [
           "ex:pilots",
@@ -258,13 +258,13 @@ const exampleShapesGraph = {
       "type": "@type",
       "friend": { "@type": "@id" },
       "marriedTo": { "@type": "@id" },
-      "copilotCopy": { "@type": "@id" },
+      "beenTo": { "@type": "@id" },
       "pilots": { "@type": "@id" },
       "affiliation": { "@type": "@id" },
       "copilot": { "@type": "@id" },
       "friendOfPartner": { "@type": "@id" }
     },
-    "id": "CHEWBACCA"
+    "id": "HAN"
   }, {
     "embed": false,
     "explicit": false,//true,//true,//false,
