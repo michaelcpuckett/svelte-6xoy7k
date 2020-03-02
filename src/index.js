@@ -182,14 +182,17 @@ const exampleShapesGraph = {
     "type": "NodeShape",
     "targetSubjectsOf": "ex:affiliation", // TODO targetObjectsOf not implemented
     "property": [{
-      "path": "ex:beenTo",
+      "path": "ex:copilot",
+      "order": 2,
       "values": {
         "path": [
           "ex:pilots",
-          "ex:travelledTo"
+          {
+            "inversePath": "ex:pilots"
+          }
         ]
       }
-    }, {
+    }, /*{
       "path": "ex:friend",
       "minCount": 1,
       "values": [{
@@ -209,7 +212,7 @@ const exampleShapesGraph = {
           "inversePath": "ex:marriedTo"
         }
       }]
-    }, {
+    }, */{
       "path": "ex:pilotedBy",
       "minCount": 1,
       "values": [{
@@ -238,22 +241,15 @@ const exampleShapesGraph = {
       "marriedTo": { "@type": "@id" },
       "pilots": { "@type": "@id" },
       "affiliation": { "@type": "@id" },
-      "beenTo": { "@type": "@id" }
+      "copilot": { "@type": "@id" }
     },
-    "affiliation": { "@id": "REBEL_ALLIANCE" },
-    "@graph": {
-      "@requireAll": true,
-      "friend": { "@embed": false },
-      "marriedTo": { "@embed": false },
-      "pilots": { "@embed": false },
-      "beenTo": { "@embed": false }
-    }
+    "id": "HAN"
   }, {
     "embed": false,
     "explicit": false,//true,//true,//false,
     // "null": true,
     "omitDefault": false,
-    "requireAll": true//true
+    "requireAll": false//true
   })
   console.log(inferredAndFramed)
   // console.log(diff.addedDiff(engine.originalDataGraph, engine.inferredGraph))

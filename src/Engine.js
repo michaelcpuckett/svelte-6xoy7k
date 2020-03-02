@@ -442,11 +442,41 @@ class ValuesComponent extends SHACL {
     await Promise.all((Array.isArray(this.values) ? this.values : [this.values]).map(async v => {
       if (v.path) {
         if (Array.isArray(v.path) || v.path["@list"]) {
-          const fullPath = (v.path["@list"] || v.path).map(node => node.id)
+          const fullPath = (v.path["@list"] || v.path).map(node => node)
           // console.log({ fullPath })
-          const val = fullPath.reduce((currentNode, p) => {
-            // console.log( p, currentNode ? currentNode[p] : null)
-            return currentNode ? Array.isArray(currentNode) ? currentNode.filter(node => node[p]).map(node => node[p]) : currentNode[p] : null
+          const val = await fullPath.reduce(async (cn, p) => {
+            const currentNode = await cn
+            if (p.inversePath) {
+              if (!currentNode) {
+                return null
+              }
+              
+              console.log({ currentNode }, p.inversePath)
+              const {
+                "@context": c,
+                "@graph": g,
+                "__SHACL_inversePath_result": invertedData
+              } = (await jsonld.frame({
+                "@context": {
+                  "id": "@id",
+                  "type": "@type"
+                },
+                "@graph": graph
+              }, {
+                "@context": {
+                  "id": "@id",
+                  "type": "@type",
+                  "__SHACL_inversePath_result": { "@reverse": p.inversePath.id, "@container": "@set" }
+                },
+                "id": (Array.isArray(currentNode) ? currentNode : [currentNode]).map(({ id }) => id),
+                "__SHACL_inversePath_result": { }
+              }, {
+                explicit: true,
+                omitGraph: true
+              }))
+              return g || invertedData
+            }
+            return currentNode ? Array.isArray(currentNode) ? currentNode.filter(node => node[p.id]).map(node => node[p.id]) : currentNode[p.id] : null
           }, target)
           // console.log({ val })
           if (Array.isArray(target[path])) {
@@ -455,6 +485,7 @@ class ValuesComponent extends SHACL {
             target[path] = val
           }
         } else if (v.path.inversePath) {
+          // console.log('inversePath', v.path.inversePath.id)
           const {
             "@context": c,
             "__SHACL_inversePath_result": invertedData
@@ -476,6 +507,24 @@ class ValuesComponent extends SHACL {
             explicit: true,
             omitGraph: true
           }))
+          /*console.log(v.path.inversePath.id, graph, await jsonld.frame({
+            "@context": {
+              "id": "@id",
+              "type": "@type"
+            },
+            "@graph": graph
+          }, {
+            "@context": {
+              "id": "@id",
+              "type": "@type",
+              "__SHACL_inversePath_result": { "@reverse": v.path.inversePath.id, "@container": "@set" }
+            },
+            "id": target["id"],
+            "__SHACL_inversePath_result": { }
+          }, {
+            explicit: true,
+            omitGraph: true
+          }))*/
           if (invertedData) {
             if (Array.isArray(target[path])) {
               target[path] = [...target[path], invertedData]
