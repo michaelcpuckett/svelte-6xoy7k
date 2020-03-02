@@ -455,7 +455,10 @@ class ValuesComponent extends SHACL {
             target[path] = val
           }
         } else if (v.path.inversePath) {
-          const invertedData = ((await jsonld.frame({
+          const {
+            "@context": c,
+            ...invertedData
+          } = (await jsonld.frame({
             "@context": {
               "id": "@id",
               "type": "@type"
@@ -472,7 +475,7 @@ class ValuesComponent extends SHACL {
           }, {
             explicit: true,
             omitGraph: true
-          }))["@graph"][0]["__SHACL_inversePath_result"] || [])
+          }))
           if (invertedData) {
             if (Array.isArray(target[path])) {
               target[path] = [...target[path], invertedData]
