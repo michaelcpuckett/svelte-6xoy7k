@@ -249,7 +249,7 @@ const exampleShapesGraph = {
       "beenTo": { "@embed": false }
     }
   }, {
-    "embed": true,
+    "embed": false,
     "explicit": false,//true,//true,//false,
     // "null": true,
     "omitDefault": false,
