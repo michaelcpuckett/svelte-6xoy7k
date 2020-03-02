@@ -11,7 +11,6 @@ const exampleDataGraph = {
     "affiliation": { "@type": "@id" },
     "friend": { "@type": "@id", "@container": "@set" },
     "marriedTo": { "@type": "@id", "@container": "@set" },
-    "pilotedBy": { "@type": "@id", "@container": "@set" },
     "pilots": { "@type": "@id", "@container": "@set" },
     "affiliation": { "@type": "@id" },
     "travelledTo": { "@type": "@id" }
@@ -52,6 +51,17 @@ const exampleDataGraph = {
     {
       "id": "CORUSCANT",
       "type": "Location"
+    },
+    {
+      "id": "LUKES_XWING",
+      "type": "Ship",
+      "travelledTo": [{
+        "id": "DEGGOBAH",
+        "date": "3-ABY"
+      }, {
+        "id": "TATTOOINE",
+        "date": "6-ABY"
+      }]
     },
     {
       "id": "LANDOS_SHIP",
@@ -138,6 +148,7 @@ const exampleDataGraph = {
       "affiliation": "REBEL_ALLIANCE",
       "firstName": "Luke",
       "friend": ["HAN", "R2-D2"],
+      "pilots": ["LUKES_XWING"],
       "lastName": "Skywalker"
     },
     {
@@ -182,6 +193,12 @@ const exampleShapesGraph = {
     "type": "NodeShape",
     "targetSubjectsOf": "ex:affiliation", // TODO targetObjectsOf not implemented
     "property": [{
+      "path": "ex:friendGroupVehicles",
+      "order": 2,
+      "values": [{
+        "path": "ex:friend"
+      }]
+    }, {
       "path": "ex:copilot",
       "order": 2,
       "values": {
@@ -200,7 +217,7 @@ const exampleShapesGraph = {
           // }
         // }
       }
-    }, /*{
+    }, {
       "path": "ex:friend",
       "minCount": 1,
       "values": [{
@@ -218,14 +235,6 @@ const exampleShapesGraph = {
       }, {
         "path": {
           "inversePath": "ex:marriedTo"
-        }
-      }]
-    }, */{
-      "path": "ex:pilotedBy",
-      "minCount": 1,
-      "values": [{
-        "path": {
-          "inversePath": "ex:pilots"
         }
       }]
     }]
@@ -247,9 +256,11 @@ const exampleShapesGraph = {
       "type": "@type",
       "friend": { "@type": "@id" },
       "marriedTo": { "@type": "@id" },
+      "friendGroupVehicles": { "@type": "@id" },
       "pilots": { "@type": "@id" },
       "affiliation": { "@type": "@id" },
-      "copilot": { "@type": "@id" }
+      "copilot": { "@type": "@id" },
+      "friendOfPartner": { "@type": "@id" }
     },
     "id": "HAN"
   }, {
