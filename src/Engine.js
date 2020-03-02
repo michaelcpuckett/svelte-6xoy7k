@@ -456,7 +456,6 @@ class ValuesComponent extends SHACL {
                 return null
               }
               
-              console.log({ currentNode }, p.inversePath)
               const {
                 "@context": c,
                 "@graph": g,
@@ -483,14 +482,13 @@ class ValuesComponent extends SHACL {
             }
             return currentNode ? Array.isArray(currentNode) ? currentNode.filter(node => node[p.id]).map(node => node[p.id]) : currentNode[p.id] : null
           }, target)
-          // console.log({ val })
           if (Array.isArray(target[path])) {
             target[path] = [...target[path], val]
           } else {
             target[path] = val
           }
         } else if (v.path.inversePath) {
-          // console.log('inversePath', v.path.inversePath.id)
+          console.log(order, 'inversePath', v.path.inversePath.id, target)
           const {
             "@context": c,
             "__SHACL_inversePath_result": invertedData
