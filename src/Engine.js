@@ -440,6 +440,7 @@ class ValuesComponent extends SHACL {
 
     let path = focusNode.path.id === 'rdf:type' ? 'type' : focusNode.path.id
 
+
     await Promise.all((Array.isArray(this.values) ? this.values : [this.values]).map(async v => {
       if (v.filterShape) {
         console.log('filterShape', v.filterShape, v.nodes, { originalTarget })
@@ -448,7 +449,6 @@ class ValuesComponent extends SHACL {
       if (v.path) {
         if (Array.isArray(v.path) || v.path["@list"]) {
           const fullPath = (v.path["@list"] || v.path).map(node => node)
-          // console.log({ fullPath })
           const val = await fullPath.reduce(async (cn, p) => {
             const currentNode = await cn
             if (p.inversePath) {
@@ -488,7 +488,6 @@ class ValuesComponent extends SHACL {
             target[path] = val
           }
         } else if (v.path.inversePath) {
-          console.log(order, 'inversePath', v.path.inversePath.id, target)
           const {
             "@context": c,
             "__SHACL_inversePath_result": invertedData
@@ -518,13 +517,13 @@ class ValuesComponent extends SHACL {
             }
           }
         } 
-        // else if (target[v.path.id]) {
-        //   if (Array.isArray(target[path])) {
-        //     target[path] = [...target[path], target[v.path.id]]
-        //   } else {
-        //     target[path] = target[v.path.id]
-        //   }
-        // }
+        else if (target[v.path.id]) {
+          if (Array.isArray(target[path])) {
+            target[path] = [...target[path], target[v.path.id]]
+          } else {
+            target[path] = target[v.path.id]
+          }
+        }
       }
     }))
 
