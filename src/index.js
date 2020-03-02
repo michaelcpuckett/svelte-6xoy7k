@@ -217,7 +217,7 @@ const exampleShapesGraph = {
           // }
         // }
       }
-    }, {
+    }/*, {
       "path": "ex:friend",
       "minCount": 1,
       "values": [{
@@ -237,7 +237,7 @@ const exampleShapesGraph = {
           "inversePath": "ex:marriedTo"
         }
       }]
-    }]
+    }*/]
   }]
 }
 
