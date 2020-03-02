@@ -264,7 +264,7 @@ const exampleShapesGraph = {
       "copilot": { "@type": "@id" },
       "friendOfPartner": { "@type": "@id" }
     },
-    "id": "HAN"
+    "id": "CHEWBACCA"
   }, {
     "embed": false,
     "explicit": false,//true,//true,//false,

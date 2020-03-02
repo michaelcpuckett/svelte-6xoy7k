@@ -508,7 +508,6 @@ class ValuesComponent extends SHACL {
             "id": target["id"],
             "__SHACL_inversePath_result": { }
           }, {
-            embed: false,
             explicit: true,
             omitGraph: true
           }))
@@ -527,7 +526,7 @@ class ValuesComponent extends SHACL {
             target[path] = target[v.path.id]
           }
         } else {
-          console.log('fail_match', { target, path })
+          console.log({ target, path })
         }
       }
     }))
