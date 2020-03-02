@@ -194,14 +194,10 @@ const exampleShapesGraph = {
     "targetSubjectsOf": "ex:affiliation", // TODO targetObjectsOf not implemented
     "property": [{
       "path": "ex:copilotCopy",
-      "order": 2,
       "values": [{
         "path": [
-          "ex:copilot",
-          "ex:friend",
-          {
-            "inversePath": "ex:friend"
-          }
+          "ex:pilots",
+          "ex:travelledTo"
         ]
       }]
     }, {
@@ -268,7 +264,7 @@ const exampleShapesGraph = {
       "copilot": { "@type": "@id" },
       "friendOfPartner": { "@type": "@id" }
     },
-    "id": "CHEWBACCA"
+    "id": "HAN"
   }, {
     "embed": false,
     "explicit": false,//true,//true,//false,
