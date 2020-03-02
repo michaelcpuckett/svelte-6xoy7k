@@ -184,19 +184,21 @@ const exampleShapesGraph = {
     "property": [{
       "path": "ex:copilot",
       "order": 2,
-      "filterShape": {
-        "not": {
-          "path": "id",
-          "hasValue": "this"
-        }
-      },
       "values": {
-        "path": [
-          "ex:pilots",
-          {
-            "inversePath": "ex:pilots"
+        "nodes": {
+          "path": [
+            "ex:pilots",
+            {
+              "inversePath": "ex:pilots"
+            }
+          ]
+        },
+        "filterShape": {
+          "not": {
+            "path": "id",
+            "hasValue": "this"
           }
-        ]
+        }
       }
     }, /*{
       "path": "ex:friend",
