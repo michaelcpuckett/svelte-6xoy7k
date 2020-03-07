@@ -1,4 +1,5 @@
-import jsonld from 'jsonld'
+// import jsonld from 'jsonld'
+const jsonld = window.jsonld
 // import '../node_modules/jsonld/dist/jsonld.js' 
 
 class SHACL {

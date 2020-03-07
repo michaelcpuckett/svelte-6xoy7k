@@ -1,4 +1,4 @@
-import jsonld from 'jsonld'
+// import jsonld from 'jsonld'
 import { SHACLEngine } from './Engine.js'
 import * as diff from 'deep-object-diff'
 
